@@ -1,0 +1,115 @@
+# Production stack for the Hazard Chatbot.
+#
+# Usage on the server (from the project directory):
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Differences vs the local docker-compose.yml:
+#   * Only Caddy publishes host ports (80/443). All other services are
+#     internal-only (`expose`) so they are NOT reachable from the internet
+#     (important: Docker bypasses the host firewall, so we must not publish them at all).
+#   * restart: unless-stopped on every service (survives host restarts).
+#   * Secrets and the public hostname come from a git-ignored .env file
+#     (see .env.example).
+#   * Caddy gets a persistent volume for its ACME certificates.
+
+services:
+  postgres:
+    image: postgres:${POSTGRES_MAJOR:-16}-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB is required in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER is required in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required in .env}
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  inference:
+    build:
+      context: ./inference
+    environment:
+      PORT: 8001
+      CAPTION_MODEL_NAME: ${CAPTION_MODEL_NAME:-Salesforce/blip-image-captioning-base}
+      PRELOAD_CAPTION_MODEL: ${PRELOAD_CAPTION_MODEL:-true}
+      MIN_SCENARIO_WORDS: ${MIN_SCENARIO_WORDS:-3}
+      MIN_SCENARIO_CHARS: ${MIN_SCENARIO_CHARS:-15}
+    expose:
+      - "8001"
+    volumes:
+      - ./models:/app/models:ro
+      - hf_cache:/root/.cache/huggingface
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health').read()\""]
+      interval: 10s
+      timeout: 15s
+      retries: 18
+      start_period: 300s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      INFERENCE_URL: http://inference:8001
+      PDF_SERVICE_URL: http://pdf-service:3001
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      PRIVACY_MODE: ${PRIVACY_MODE:-true}
+      ENABLE_DB_CONTENT_LOGGING: ${ENABLE_DB_CONTENT_LOGGING:-false}
+      MIN_SCENARIO_WORDS: ${MIN_SCENARIO_WORDS:-3}
+      MIN_SCENARIO_CHARS: ${MIN_SCENARIO_CHARS:-15}
+      RUST_LOG: ${RUST_LOG:-info}
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      inference:
+        condition: service_healthy
+      pdf-service:
+        condition: service_started
+    restart: unless-stopped
+
+  pdf-service:
+    init: true
+    build:
+      context: ./pdf-service
+    environment:
+      PORT: 3001
+    expose:
+      - "3001"
+    restart: unless-stopped
+
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy/Dockerfile
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS}
+      CADDY_ACME_EMAIL: ${CADDY_ACME_EMAIL}
+    depends_on:
+      - backend
+      - inference
+      - pdf-service
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile.prod:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+  hf_cache:

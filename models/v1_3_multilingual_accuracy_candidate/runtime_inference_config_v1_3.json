@@ -1,0 +1,29 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "architecture": {
+        "image_captioning": "BLIP-2 captions generated before classification",
+        "embedding_model": "intfloat/multilingual-e5-large",
+        "stage1": "hazard_present / no_hazard / unclear_insufficient_evidence",
+        "stage2": "6-class hazard category classifier, only if stage1 = hazard_present",
+        "risk": "deterministic severity_score rule",
+        "enterprise_layer": "post-classification guardrails + manual review policy"
+    },
+    "thresholds": {
+        "stage1_confidence_manual_review": 0.75,
+        "stage2_confidence_manual_review": 0.65
+    },
+    "manual_review_triggers": [
+        "unclear_insufficient_evidence",
+        "low_stage1_confidence",
+        "low_stage2_confidence",
+        "weak_or_filtered_image_caption",
+        "ambiguous_chemical_container_context",
+        "rule_based_guardrail_applied"
+    ],
+    "input_format": {
+        "text_only": "User report: <user_text>.",
+        "text_plus_image_caption": "User report: <user_text>. Image caption: <blip2_caption>.",
+        "embedding_prefix": "passage: "
+    },
+    "important_note": "Do not force every input into a hazard category. Stage 1 gate must run first."
+}

@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot Prototype Usability Evaluation Questionnaire</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f3d;
+    --navy-mid: #1a3560;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --accent-hover: #1d4ed8;
+    --success: #16a34a;
+    --error: #dc2626;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  html { scroll-behavior: smooth; overflow-x: clip; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 15px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--navy);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .topbar-brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .topbar-logo {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: white; font-size: 13px; letter-spacing: 0.5px;
+  }
+  .topbar-university {
+    color: #bfdbfe;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    line-height: 1;
+    width: fit-content;
+  }
+  .topbar-university:hover { color: white; }
+  .topbar-title {
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.9;
+    letter-spacing: 0.3px;
+  }
+  .lang-toggle {
+    display: flex;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .lang-btn {
+    padding: 6px 14px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.8px;
+    transition: all 0.2s;
+  }
+  .lang-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+  .lang-btn:hover:not(.active) { color: white; background: rgba(255,255,255,0.1); }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    position: sticky;
+    top: 56px;
+    z-index: 95;
+    overflow: hidden;
+  }
+  .progress-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #60a5fa);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 36px;
+    text-align: right;
+  }
+  .flow-stepper {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .flow-step {
+    flex: 1 1 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 2px 4px 0;
+    text-decoration: none;
+    color: var(--text-muted);
+    text-align: center;
+    cursor: pointer;
+  }
+  /* connector to the next step: dotted ahead, solid once passed */
+  .flow-step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    width: 100%;
+    border-top: 2px dotted var(--border);
+    z-index: 1;
+  }
+  .flow-step__num {
+    position: relative;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 700;
+    border: 3px solid var(--white);
+    box-shadow: 0 0 0 1px var(--border);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .flow-step__label {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-muted);
+    max-width: 96px;
+  }
+  /* current step */
+  .flow-step.is-active .flow-step__num {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 0 4px var(--accent-light);
+  }
+  .flow-step.is-active .flow-step__label { color: var(--navy); }
+  /* passed step (locked — no way back) */
+  .flow-step.is-complete .flow-step__num {
+    background: var(--success);
+    color: #fff;
+    box-shadow: 0 0 0 1px var(--success);
+  }
+  .flow-step.is-complete .flow-step__label { color: #166534; }
+  .flow-step.is-complete::after { border-top: 2px solid var(--success); }
+  .flow-step.is-complete { pointer-events: none; cursor: default; }
+  /* upcoming step (clickable to advance) */
+  .flow-step.is-upcoming:hover .flow-step__num {
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .flow-step.is-upcoming:hover .flow-step__label { color: var(--accent); }
+  /* step-3 inline questionnaire progress (bar left-to-right + % on the right) */
+  .flow-step__progress {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    margin-top: 4px;
+  }
+  .flow-step.is-active .flow-step__progress,
+  .flow-step.is-complete .flow-step__progress { display: flex; }
+  .flow-step__progress-track {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .flow-step__progress-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #60a5fa);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .flow-step__progress.is-full .flow-step__progress-fill { background: var(--success); }
+  .flow-step__progress-pct {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 26px;
+    text-align: right;
+  }
+  .flow-step__progress.is-full .flow-step__progress-pct { color: var(--success); }
+  /* Submission (step 4) is reached only by submitting */
+  .flow-step.is-locked { pointer-events: none; cursor: default; }
+  /* back-to-start link on the success screen */
+  .success-restart { margin-top: 14px; text-align: center; }
+  .success-restart a { display: inline-block; text-decoration: none; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    background: rgba(37,99,235,0.3);
+    border: 1px solid rgba(37,99,235,0.5);
+    color: #93c5fd;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    color: white;
+    font-size: clamp(22px, 4vw, 32px);
+    line-height: 1.25;
+    max-width: 680px;
+    margin: 0 auto 16px;
+    font-weight: 400;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,0.65);
+    font-size: 14px;
+    max-width: 560px;
+    margin: 0 auto 24px;
+    line-height: 1.7;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 14px;
+    margin: 18px auto 0;
+    color: #dbeafe;
+    font-size: 12px;
+    line-height: 1.6;
+    max-width: 760px;
+  }
+  .hero-meta a {
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .hero-meta a:hover { text-decoration: underline; }
+  .chatbot-link-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 10px 18px;
+    color: #93c5fd;
+    font-size: 13px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .chatbot-link-box:hover { background: rgba(255,255,255,0.14); }
+  .chatbot-link-box svg { flex-shrink: 0; }
+  .chatbot-link-box.is-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  /* ── DEMO VIDEO ── */
+  .demo-video-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 24px auto 18px;
+    padding: 16px;
+  }
+  .demo-video-step {
+    display: inline-block;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: var(--accent);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+  }
+  .demo-video-title {
+    font-size: 18px;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .demo-video-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .demo-video-player {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #020617;
+  }
+  .workflow-frame {
+    display: block;
+    width: 100%;
+    min-height: 460px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #020617;
+  }
+  .demo-video-fallback {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .demo-video-fallback a {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ── CONSENT ── */
+  .consent-banner {
+    background: var(--accent-light);
+    border-left: 4px solid var(--accent);
+    margin: 24px auto;
+    max-width: 760px;
+    padding: 14px 18px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .consent-banner svg { flex-shrink: 0; margin-top: 2px; }
+  .consent-banner p { font-size: 13px; color: var(--navy); line-height: 1.6; }
+  .institution-note {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    margin: 14px auto 18px;
+    max-width: 760px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--navy);
+    line-height: 1.6;
+  }
+  .institution-note strong { font-weight: 700; }
+  .consent-check-row {
+    max-width: 760px;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 0 0 4px;
+  }
+  .consent-check-row input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .consent-check-row label { font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.5; }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px 64px;
+    flex: 1 0 auto;
+  }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .section-header {
+    background: var(--navy);
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-num {
+    width: 26px; height: 26px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: white;
+    flex-shrink: 0;
+  }
+  .section-title {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .section-body { padding: 22px; }
+
+  /* ── QUESTION ── */
+  .question-block {
+    margin-bottom: 24px;
+  }
+  .question-block:last-child { margin-bottom: 0; }
+  .q-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .q-label .req { color: var(--error); margin-left: 3px; }
+
+  /* Radio / Checkbox groups */
+  .radio-group, .check-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .radio-group label, .check-group label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .radio-group label:hover, .check-group label:hover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+  .radio-group input, .check-group input {
+    accent-color: var(--accent);
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+  }
+  .radio-group label:has(input:checked),
+  .check-group label:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  /* Likert scale */
+  .likert-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .likert-table thead th:not(.col-stmt) { width: 11%; }
+  .likert-table thead th {
+    padding: 8px 6px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid var(--border);
+  }
+  .likert-table thead th.col-stmt {
+    text-align: left;
+    width: 46%;
+  }
+  .likert-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .likert-table tbody tr:last-child { border-bottom: none; }
+  .likert-table tbody tr:hover { background: #f8fafc; }
+  .likert-table tbody td {
+    padding: 0;
+    text-align: center;
+    vertical-align: middle;
+  }
+  .likert-table tbody td.stmt-cell {
+    text-align: left;
+    padding: 11px 12px 11px 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+  .likert-radio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px;
+    margin: 0;
+    cursor: pointer;
+    min-height: 24px;
+    border-radius: 6px;
+    transition: background 0.12s;
+  }
+  .likert-radio:hover { background: var(--accent-light); }
+  .likert-radio-text { display: none; }
+  .likert-table tbody td input[type="radio"] {
+    accent-color: var(--accent);
+    width: 18px; height: 18px;
+    cursor: pointer;
+  }
+
+  /* Mobile likert fallback */
+  @media (max-width: 560px) {
+    .likert-table thead { display: none; }
+    .likert-table tbody tr {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .likert-table tbody td { display: block; text-align: left; padding: 2px 0; }
+    .likert-table tbody td.stmt-cell {
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .likert-radio {
+      justify-content: flex-start;
+      gap: 10px;
+      padding: 10px 8px;
+      min-height: 44px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      margin-bottom: 6px;
+    }
+    .likert-radio-text { display: inline; font-size: 13px; color: var(--text); }
+    .likert-mobile-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .likert-mobile-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+    .likert-mobile-item input { width: 18px; height: 18px; }
+  }
+
+  /* Star rating */
+  .star-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .star-option { display: none; }
+  .star-label {
+    font-size: 28px;
+    cursor: pointer;
+    color: #cbd5e1;
+    transition: color 0.15s, transform 0.1s;
+    line-height: 1;
+  }
+  .star-label:hover,
+  .star-label:hover ~ .star-label { color: #f59e0b; }
+  .star-option:checked ~ .star-label { color: #f59e0b; }
+  .star-group { display: flex; flex-direction: row-reverse; gap: 4px; }
+  .star-group .star-label:hover,
+  .star-group .star-label:hover ~ .star-label,
+  .star-group .star-option:checked ~ .star-label { color: #f59e0b; }
+  .star-value-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-left: 6px;
+  }
+
+  /* Textarea */
+  textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color 0.2s;
+    background: var(--white);
+  }
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+  }
+  textarea.optional { background: #fafafa; }
+
+  /* Divider */
+  .q-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── ERROR MESSAGES ── */
+  .field-error {
+    display: none;
+    color: var(--error);
+    font-size: 12px;
+    margin-top: 6px;
+    align-items: center;
+    gap: 4px;
+  }
+  .field-error.visible { display: flex !important; }
+  .form-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    color: var(--error);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .form-error-banner.visible { display: block; }
+
+  /* ── SUBMIT AREA ── */
+  .submit-area {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .btn-submit {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 14px 48px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+    letter-spacing: 0.2px;
+  }
+  .btn-submit:hover:not(:disabled) {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+  }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* ── SUCCESS ── */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 64px 24px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .success-screen.visible { display: block; }
+  .success-icon {
+    width: 64px; height: 64px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .success-screen h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--navy);
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+  .success-screen p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .success-share {
+    margin-top: 18px;
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+  .success-share-title {
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .success-share-text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .success-share-actions {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .btn-share {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-share-primary {
+    color: white;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn-share-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn-share-secondary {
+    color: var(--accent);
+    background: white;
+  }
+  .btn-share-secondary:hover {
+    background: var(--accent-light);
+    border-color: #bfdbfe;
+  }
+  .share-status {
+    min-height: 18px;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* ── FOOTER ── */
+  .form-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    background: var(--white);
+    margin-top: 40px;
+    flex-shrink: 0;
+  }
+
+  /* ── HIGHLIGHT ERRORS ── */
+  .has-error .radio-group label,
+  .has-error .check-group label {
+    border-color: #fca5a5;
+  }
+  .has-error textarea {
+    border-color: var(--error);
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 32px 16px 28px; }
+    .section-body { padding: 16px; }
+    .topbar-brand-text { gap: 0; }
+    .topbar-university { font-size: 10px; }
+    .topbar-title {
+      display: block;
+      font-size: 11px;
+      line-height: 1.4;
+      max-width: 190px;
+    }
+    .progress-wrap {
+      top: 60px;
+      padding: 10px 16px;
+    }
+    .flow-step__num { width: 30px; height: 30px; font-size: 13px; }
+    .flow-step__label { font-size: 10px; max-width: 80px; }
+    .flow-step:not(:last-child)::after { top: 16px; }
+    .demo-video-card { padding: 12px; }
+    .demo-video-title { font-size: 16px; }
+    .workflow-frame { min-height: 340px; }
+    .btn-submit { width: 100%; }
+    .success-share-actions .btn-share { width: 100%; }
+  }
+
+  /* ── TAB PANELS (single-page stepper) ── */
+  .tab-panel { display: none; }
+  .tab-panel.is-active { display: block; animation: tab-fade 0.25s ease; }
+  @keyframes tab-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  main.main--chatbot { max-width: none; padding: 0; }
+  .chatbot-panel { margin: 0; }
+  .chatbot-embed {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 190px);
+    min-height: 460px;
+    border: none;
+    background: var(--white);
+  }
+  .chatbot-fallback {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 10px 16px;
+  }
+  .chatbot-fallback a { color: var(--accent); font-weight: 600; }
+  .questionnaire-progress {
+    background: var(--accent-light);
+    border: 1px solid #bfdbfe;
+    border-radius: var(--radius);
+    margin: 4px 0 16px;
+    padding: 14px 16px;
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .questionnaire-progress.complete {
+    background: #f0fdf4;
+    border-color: #86efac;
+  }
+  .questionnaire-progress.complete .progress-label { color: var(--success); }
+  .questionnaire-progress .progress-caption {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--navy);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .questionnaire-progress .progress-top { margin: 0; }
+  @media (max-width: 600px) {
+    .chatbot-embed { height: calc(100vh - 220px); min-height: 420px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">CP</div>
+    <div class="topbar-brand-text">
+      <a class="topbar-university" href="https://www.berlinsbi.com/" target="_blank" rel="noopener">BSBI University</a>
+      <span class="topbar-title" data-en="MSc Artificial Intelligence Dissertation · Chatbot Prototype Study" data-de="MSc Künstliche Intelligenz Dissertation · Chatbot-Prototyp-Studie">MSc Artificial Intelligence Dissertation · Chatbot Prototype Study</span>
+    </div>
+  </div>
+  <div class="lang-toggle" role="group" aria-label="Language selector">
+    <button class="lang-btn active" id="btn-en" onclick="setLang('en')" aria-pressed="true">EN</button>
+    <button class="lang-btn" id="btn-de" onclick="setLang('de')" aria-pressed="false">DE</button>
+  </div>
+</div>
+
+<!-- PROGRESS BAR + FLOW STEPPER -->
+<div class="progress-wrap">
+  <nav class="flow-stepper" aria-label="Workflow steps">
+    <a class="flow-step" id="flow-step-1" data-flow-step="1" href="#">
+      <span class="flow-step__num">1</span>
+      <span class="flow-step__label" data-en="Watch Demo" data-de="Demo ansehen">Watch Demo</span>
+    </a>
+    <a class="flow-step" id="flow-step-2" data-flow-step="2" href="#">
+      <span class="flow-step__num">2</span>
+      <span class="flow-step__label" data-en="Try Chatbot" data-de="Chatbot testen">Try Chatbot</span>
+    </a>
+    <a class="flow-step" id="flow-step-3" data-flow-step="3" href="#">
+      <span class="flow-step__num">3</span>
+      <span class="flow-step__label" data-en="Questionnaire" data-de="Fragebogen">Questionnaire</span>
+      <span class="flow-step__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <span class="flow-step__progress-track"><span class="flow-step__progress-fill" id="progress-fill"></span></span>
+        <span class="flow-step__progress-pct" id="progress-label">0%</span>
+      </span>
+    </a>
+    <a class="flow-step" id="flow-step-4" data-flow-step="4" href="#">
+      <span class="flow-step__num">4</span>
+      <span class="flow-step__label" data-en="Submission" data-de="Absenden">Submission</span>
+    </a>
+  </nav>
+</div>
+
+<!-- HERO (Tab 1 landing) -->
+<div class="hero tab-panel is-active" data-tab-panel="1">
+  <div class="hero-eyebrow" data-en="Academic Research · Anonymised" data-de="Akademische Forschung · Anonymisiert">Academic Research · Anonymised</div>
+  <h1 data-en="Usability Evaluation Questionnaire for the Chatbot Prototype" data-de="Usability-Evaluierungsfragebogen für den Chatbot-Prototyp">Usability Evaluation Questionnaire for the Chatbot Prototype</h1>
+  <p class="hero-sub" data-en="This questionnaire is part of an MSc Artificial Intelligence dissertation evaluating the usability and decision-support capability of a chatbot prototype. Responses will be anonymised and used only for academic analysis." data-de="Dieser Fragebogen ist Teil einer MSc-Dissertation im Bereich Künstliche Intelligenz und bewertet die Benutzerfreundlichkeit und Entscheidungsunterstützung eines Chatbot-Prototyps. Alle Antworten werden anonymisiert und nur für akademische Analysen verwendet.">This questionnaire is part of an MSc Artificial Intelligence dissertation evaluating the usability and decision-support capability of a chatbot prototype. Responses will be anonymised and used only for academic analysis.</p>
+  <div class="hero-meta" data-en="University Dissertation · Kumar Viswajeet · Supervisor: Dr Vincent English · Subject: MSc Artificial Intelligence · Institution: Berlin School of Business and Innovation (BSBI), Berlin, Germany" data-de="Universitätsdissertation · Kumar Viswajeet · Betreuer: Dr Vincent English · Studiengang: MSc Künstliche Intelligenz · Institution: Berlin School of Business and Innovation (BSBI), Berlin, Deutschland">University Dissertation · Kumar Viswajeet · Supervisor: Dr Vincent English · Subject: MSc Artificial Intelligence · Institution: Berlin School of Business and Innovation (BSBI), Berlin, Germany</div>
+</div>
+
+<main>
+
+  <!-- TAB 1 · DEMO VIDEO -->
+  <section class="demo-video-card tab-panel is-active" data-tab-panel="1" id="demo-video-card" aria-labelledby="demo-video-title">
+    <div class="demo-video-step" id="workspace-step-chip" data-en="Step 1 · Watch Demo Video" data-de="Schritt 1 · Demo-Video ansehen">Step 1 · Watch Demo Video</div>
+    <h2 class="demo-video-title" id="demo-video-title" data-en="Watch Demo Video" data-de="Demo-Video ansehen">Watch Demo Video</h2>
+    <p class="demo-video-sub" id="workspace-sub" data-en="Watch the demo first. Then continue with Step 2 to try the chatbot." data-de="Sehen Sie zuerst die Demo an. Fahren Sie dann mit Schritt 2 fort, um den Chatbot zu testen.">Watch the demo first. Then continue with Step 2 to try the chatbot.</p>
+    <video
+      id="workflow-video"
+      class="demo-video-player"
+      controls
+      preload="metadata"
+      playsinline
+    >
+      <source src="/chatbot/Video/Guide.mp4" type="video/mp4">
+    </video>
+    <p class="demo-video-fallback">
+      <span data-en="If the player does not open, use" data-de="Falls der Player nicht startet, verwenden Sie">If the player does not open, use</span>
+      <a href="/chatbot/Video/Guide.mp4" target="_blank" rel="noopener" data-en="this direct MP4 link" data-de="diesen direkten MP4-Link">this direct MP4 link</a>.
+    </p>
+  </section>
+
+  <!-- TAB 2 · TRY CHATBOT (full-bleed embed) -->
+  <section class="tab-panel chatbot-panel" data-tab-panel="2" aria-label="Try the chatbot">
+    <iframe
+      id="chatbot-frame"
+      class="chatbot-embed"
+      data-src="/chatbot/"
+      title="Workplace Hazard AI Chatbot"
+      loading="lazy"
+    ></iframe>
+    <p class="chatbot-fallback">
+      <span data-en="If the chatbot does not load here," data-de="Falls der Chatbot hier nicht lädt,">If the chatbot does not load here,</span>
+      <a href="/chatbot/" target="_blank" rel="noopener" data-en="open it in a new tab" data-de="in neuem Tab öffnen">open it in a new tab</a>.
+    </p>
+  </section>
+
+  <!-- TAB 3 · QUESTIONNAIRE -->
+  <section class="tab-panel" data-tab-panel="3">
+
+  <!-- CONSENT -->
+  <div class="consent-banner" role="note">
+    <svg width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+    <p data-en="Please access the chatbot prototype using the link above, complete the provided test scenarios, and then answer the questionnaire based on your experience." data-de="Bitte öffnen Sie den Chatbot-Prototypen über den Link oben, führen Sie die vorgesehenen Testszenarien durch und beantworten Sie anschließend den Fragebogen basierend auf Ihrer Erfahrung.">Please access the chatbot prototype using the link above, complete the provided test scenarios, and then answer the questionnaire based on your experience.</p>
+  </div>
+
+  <div class="institution-note" role="note">
+    <span data-en="<strong>Institution transparency:</strong> This research questionnaire is conducted for the MSc Artificial Intelligence dissertation at the Berlin School of Business and Innovation (BSBI), located in Berlin, Germany." data-de="<strong>Transparenz zur Institution:</strong> Dieser Forschungsfragebogen wird für die MSc-Dissertation im Bereich Künstliche Intelligenz an der Berlin School of Business and Innovation (BSBI) durchgeführt, mit Standort in Berlin, Deutschland."><strong>Institution transparency:</strong> This research questionnaire is conducted for the MSc Artificial Intelligence dissertation at the Berlin School of Business and Innovation (BSBI), located in Berlin, Germany.</span>
+  </div>
+
+  <div class="consent-check-row">
+    <input type="checkbox" id="consent-cb" onchange="updateProgress()">
+    <label for="consent-cb" data-en="I understand that this questionnaire is for academic research purposes only and that my responses will be anonymised." data-de="Ich verstehe, dass dieser Fragebogen ausschließlich für akademische Forschungszwecke verwendet wird und meine Antworten anonymisiert werden.">I understand that this questionnaire is for academic research purposes only and that my responses will be anonymised.</label>
+  </div>
+  <div class="field-error" id="err-consent">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+    <span data-en="Please confirm your consent to proceed." data-de="Bitte bestätigen Sie Ihre Einwilligung, um fortzufahren.">Please confirm your consent to proceed.</span>
+  </div>
+
+  <form id="survey-form" novalidate>
+    <input type="hidden" id="field-lang" name="language">
+    <input type="hidden" id="field-ts" name="timestamp">
+    <!-- For 5-point Likert analysis, reverse-code reverse items as: recoded = 6 - original -->
+    <input type="hidden" name="reverse_items" value="l7,l19">
+
+    <!-- SECTION 1: Background -->
+    <div class="section-card" id="sec1">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title" data-en="Participant Background" data-de="Hintergrund der Teilnehmenden">Participant Background</div>
+      </div>
+      <div class="section-body">
+
+        <!-- Q1 -->
+        <div class="question-block" id="qb-q1">
+          <label class="q-label" for="q1">
+            <span data-en="Q1. What is your general background?" data-de="F1. Was ist Ihr allgemeiner Hintergrund?">Q1. What is your general background?</span>
+            <span class="req">*</span>
+          </label>
+          <div class="radio-group" id="q1-group">
+            <label><input type="radio" name="q1" value="Health & Safety Professional" onchange="updateProgress()"> <span data-en="Health &amp; Safety Professional" data-de="Fachkraft für Gesundheitsschutz und Sicherheit">Health &amp; Safety Professional</span></label>
+            <label><input type="radio" name="q1" value="Engineer / Technical Specialist" onchange="updateProgress()"> <span data-en="Engineer / Technical Specialist" data-de="Ingenieur*in / Technische Fachkraft">Engineer / Technical Specialist</span></label>
+            <label><input type="radio" name="q1" value="Manager / Supervisor" onchange="updateProgress()"> <span data-en="Manager / Supervisor" data-de="Manager*in / Vorgesetzte*r">Manager / Supervisor</span></label>
+            <label><input type="radio" name="q1" value="Academic / Researcher" onchange="updateProgress()"> <span data-en="Academic / Researcher" data-de="Akademiker*in / Forscher*in">Academic / Researcher</span></label>
+            <label><input type="radio" name="q1" value="Student" onchange="updateProgress()"> <span data-en="Student" data-de="Studierende*r">Student</span></label>
+            <label><input type="radio" name="q1" value="Other" onchange="updateProgress()"> <span data-en="Other" data-de="Sonstiges">Other</span></label>
+          </div>
+          <div class="field-error" id="err-q1">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            <span data-en="Please select your background." data-de="Bitte wählen Sie Ihren Hintergrund aus.">Please select your background.</span>
+          </div>
+        </div>
+
+        <hr class="q-divider">
+
+        <!-- Q2 -->
+        <div class="question-block" id="qb-q2">
+          <label class="q-label">
+            <span data-en="Q2. Do you have prior experience with workplace health and safety procedures?" data-de="F2. Haben Sie Vorerfahrungen mit betrieblichen Gesundheitsschutz- und Sicherheitsverfahren?">Q2. Do you have prior experience with workplace health and safety procedures?</span>
+            <span class="req">*</span>
+          </label>
+          <div class="radio-group">
+            <label><input type="radio" name="q2" value="Yes, extensive experience" onchange="updateProgress()"> <span data-en="Yes, extensive experience" data-de="Ja, umfangreiche Erfahrung">Yes, extensive experience</span></label>
+            <label><input type="radio" name="q2" value="Yes, some experience" onchange="updateProgress()"> <span data-en="Yes, some experience" data-de="Ja, etwas Erfahrung">Yes, some experience</span></label>
+            <label><input type="radio" name="q2" value="No experience" onchange="updateProgress()"> <span data-en="No experience" data-de="Keine Erfahrung">No experience</span></label>
+          </div>
+          <div class="field-error" id="err-q2">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            <span data-en="Please select an option." data-de="Bitte wählen Sie eine Option aus.">Please select an option.</span>
+          </div>
+        </div>
+
+        <hr class="q-divider">
+
+        <!-- Q3 -->
+        <div class="question-block" id="qb-q3">
+          <label class="q-label">
+            <span data-en="Q3. Have you used an AI chatbot before?" data-de="F3. Haben Sie schon einmal einen KI-Chatbot verwendet?">Q3. Have you used an AI chatbot before?</span>
+            <span class="req">*</span>
+          </label>
+          <div class="radio-group">
+            <label><input type="radio" name="q3" value="Yes, regularly" onchange="updateProgress()"> <span data-en="Yes, regularly" data-de="Ja, regelmäßig">Yes, regularly</span></label>
+            <label><input type="radio" name="q3" value="Yes, occasionally" onchange="updateProgress()"> <span data-en="Yes, occasionally" data-de="Ja, gelegentlich">Yes, occasionally</span></label>
+            <label><input type="radio" name="q3" value="No, never" onchange="updateProgress()"> <span data-en="No, never" data-de="Nein, noch nie">No, never</span></label>
+          </div>
+          <div class="field-error" id="err-q3">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            <span data-en="Please select an option." data-de="Bitte wählen Sie eine Option aus.">Please select an option.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2: Usability -->
+    <div class="section-card" id="sec2">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title" data-en="Usability and Interaction Experience" data-de="Benutzbarkeit und Interaktionserfahrung">Usability and Interaction Experience</div>
+      </div>
+      <div class="section-body">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" data-en="1 = Strongly Disagree &nbsp;·&nbsp; 2 = Disagree &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Agree &nbsp;·&nbsp; 5 = Strongly Agree" data-de="1 = Stimme überhaupt nicht zu &nbsp;·&nbsp; 2 = Stimme nicht zu &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Stimme zu &nbsp;·&nbsp; 5 = Stimme voll zu">1 = Strongly Disagree &nbsp;·&nbsp; 2 = Disagree &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Agree &nbsp;·&nbsp; 5 = Strongly Agree</p>
+
+        <div id="likert-wrap-a">
+        <table class="likert-table" id="likert-desktop-a" aria-label="Usability and interaction evaluation">
+          <thead>
+            <tr>
+              <th class="col-stmt" data-en="Statement" data-de="Aussage">Statement</th>
+              <th data-en="1<br>Strongly<br>Disagree" data-de="1<br>Stimme überhaupt<br>nicht zu">1<br><span style="font-weight:400;font-size:10px;" data-en="Strongly Disagree" data-de="Stimme überhaupt nicht zu">Strongly Disagree</span></th>
+              <th>2<br><span style="font-weight:400;font-size:10px;" data-en="Disagree" data-de="Stimme nicht zu">Disagree</span></th>
+              <th>3<br><span style="font-weight:400;font-size:10px;" data-en="Neutral" data-de="Neutral">Neutral</span></th>
+              <th>4<br><span style="font-weight:400;font-size:10px;" data-en="Agree" data-de="Stimme zu">Agree</span></th>
+              <th>5<br><span style="font-weight:400;font-size:10px;" data-en="Strongly Agree" data-de="Stimme voll zu">Strongly Agree</span></th>
+            </tr>
+          </thead>
+          <tbody id="likert-body-a"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Safety Assessment -->
+    <div class="section-card" id="sec3">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title" data-en="Safety Assessment and Decision-Support Evaluation" data-de="Sicherheitsbewertung und Entscheidungsunterstützung">Safety Assessment and Decision-Support Evaluation</div>
+      </div>
+      <div class="section-body">
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;" data-en="1 = Strongly Disagree &nbsp;·&nbsp; 2 = Disagree &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Agree &nbsp;·&nbsp; 5 = Strongly Agree" data-de="1 = Stimme überhaupt nicht zu &nbsp;·&nbsp; 2 = Stimme nicht zu &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Stimme zu &nbsp;·&nbsp; 5 = Stimme voll zu">1 = Strongly Disagree &nbsp;·&nbsp; 2 = Disagree &nbsp;·&nbsp; 3 = Neutral &nbsp;·&nbsp; 4 = Agree &nbsp;·&nbsp; 5 = Strongly Agree</p>
+
+        <div id="likert-wrap">
+        <table class="likert-table" id="likert-desktop-b" aria-label="Safety and decision-support evaluation">
+          <thead>
+            <tr>
+              <th class="col-stmt" data-en="Statement" data-de="Aussage">Statement</th>
+              <th data-en="1<br>Strongly<br>Disagree" data-de="1<br>Stimme überhaupt<br>nicht zu">1<br><span style="font-weight:400;font-size:10px;" data-en="Strongly Disagree" data-de="Stimme überhaupt nicht zu">Strongly Disagree</span></th>
+              <th>2<br><span style="font-weight:400;font-size:10px;" data-en="Disagree" data-de="Stimme nicht zu">Disagree</span></th>
+              <th>3<br><span style="font-weight:400;font-size:10px;" data-en="Neutral" data-de="Neutral">Neutral</span></th>
+              <th>4<br><span style="font-weight:400;font-size:10px;" data-en="Agree" data-de="Stimme zu">Agree</span></th>
+              <th>5<br><span style="font-weight:400;font-size:10px;" data-en="Strongly Agree" data-de="Stimme voll zu">Strongly Agree</span></th>
+            </tr>
+          </thead>
+          <tbody id="likert-body-b"></tbody>
+        </table>
+        </div>
+        <div class="field-error" id="err-likert" style="margin-top:10px;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+          <span data-en="Please rate all statements in Sections 2 and 3." data-de="Bitte bewerten Sie alle Aussagen in Abschnitt 2 und 3.">Please rate all statements in Sections 2 and 3.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Open-ended -->
+    <div class="section-card" id="sec4">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title" data-en="Open-Ended Feedback" data-de="Offene Rückmeldungen">Open-Ended Feedback</div>
+      </div>
+      <div class="section-body">
+
+        <!-- Q24 required -->
+        <div class="question-block" id="qb-q24">
+          <label class="q-label" for="q24">
+            <span data-en="Q24. Which part of the chatbot prototype response was most useful?" data-de="F24. Welcher Teil der Antwort des Chatbot-Prototyps war am nützlichsten?">Q24. Which part of the chatbot prototype response was most useful?</span>
+            <span class="req">*</span>
+          </label>
+          <textarea id="q24" name="q24_most_useful" placeholder="" onchange="updateProgress()" oninput="updateProgress()"></textarea>
+          <div class="field-error" id="err-q24">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            <span data-en="This field is required." data-de="Dieses Feld ist erforderlich.">This field is required.</span>
+          </div>
+        </div>
+
+        <hr class="q-divider">
+
+        <!-- Q25 optional -->
+        <div class="question-block">
+          <label class="q-label" for="q25">
+            <span data-en="Q25. Was any part of the chatbot prototype response unclear or confusing?" data-de="F25. War ein Teil der Antwort des Chatbot-Prototyps unklar oder verwirrend?">Q25. Was any part of the chatbot prototype response unclear or confusing?</span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:4px;" data-en="(Optional)" data-de="(Optional)">(Optional)</span>
+          </label>
+          <textarea id="q25" name="q25_unclear" class="optional" placeholder=""></textarea>
+        </div>
+
+        <hr class="q-divider">
+
+        <!-- Q26 optional -->
+        <div class="question-block">
+          <label class="q-label" for="q26">
+            <span data-en="Q26. Did the chatbot prototype miss any important safety information?" data-de="F26. Hat der Chatbot-Prototyp wichtige Sicherheitsinformationen übersehen?">Q26. Did the chatbot prototype miss any important safety information?</span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:4px;" data-en="(Optional)" data-de="(Optional)">(Optional)</span>
+          </label>
+          <textarea id="q26" name="q26_missing_info" class="optional" placeholder=""></textarea>
+        </div>
+
+        <hr class="q-divider">
+
+        <!-- Q27 optional -->
+        <div class="question-block">
+          <label class="q-label" for="q27">
+            <span data-en="Q27. What improvement would make the chatbot prototype more useful?" data-de="F27. Welche Verbesserung würde den Chatbot-Prototyp nützlicher machen?">Q27. What improvement would make the chatbot prototype more useful?</span>
+            <span style="font-size:11px;color:var(--text-muted);margin-left:4px;" data-en="(Optional)" data-de="(Optional)">(Optional)</span>
+          </label>
+          <textarea id="q27" name="q27_improvement" class="optional" placeholder=""></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 5: Overall Rating -->
+    <div class="section-card" id="sec5">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title" data-en="Overall Rating" data-de="Gesamtbewertung">Overall Rating</div>
+      </div>
+      <div class="section-body">
+        <div class="question-block" id="qb-q28">
+          <label class="q-label">
+            <span data-en="Q28. Overall, how useful was the chatbot prototype for early-stage workplace hazard screening?" data-de="F28. Wie nützlich war der Chatbot-Prototyp insgesamt für die Früherkennung von Arbeitsplatzgefahren?">Q28. Overall, how useful was the chatbot prototype for early-stage workplace hazard screening?</span>
+            <span class="req">*</span>
+          </label>
+          <p style="font-size:12px;color:var(--text-muted);margin:4px 0 8px;" data-en="1 = Not useful at all<br>2 = Slightly useful<br>3 = Moderately useful<br>4 = Very useful<br>5 = Extremely useful" data-de="1 = Überhaupt nicht nützlich<br>2 = Wenig nützlich<br>3 = Mäßig nützlich<br>4 = Sehr nützlich<br>5 = Äußerst nützlich">1 = Not useful at all<br>2 = Slightly useful<br>3 = Moderately useful<br>4 = Very useful<br>5 = Extremely useful</p>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px;">
+            <div class="star-group" id="star-group" role="radiogroup" aria-label="Star rating 1 to 5">
+              <input class="star-option" type="radio" name="q28_rating" id="s5" value="5" onchange="updateProgress(); updateStarLabel(5)">
+              <label class="star-label" for="s5" aria-label="5 stars">★</label>
+              <input class="star-option" type="radio" name="q28_rating" id="s4" value="4" onchange="updateProgress(); updateStarLabel(4)">
+              <label class="star-label" for="s4" aria-label="4 stars">★</label>
+              <input class="star-option" type="radio" name="q28_rating" id="s3" value="3" onchange="updateProgress(); updateStarLabel(3)">
+              <label class="star-label" for="s3" aria-label="3 stars">★</label>
+              <input class="star-option" type="radio" name="q28_rating" id="s2" value="2" onchange="updateProgress(); updateStarLabel(2)">
+              <label class="star-label" for="s2" aria-label="2 stars">★</label>
+              <input class="star-option" type="radio" name="q28_rating" id="s1" value="1" onchange="updateProgress(); updateStarLabel(1)">
+              <label class="star-label" for="s1" aria-label="1 star">★</label>
+            </div>
+            <span class="star-value-label" id="star-label-text"></span>
+          </div>
+          <div class="field-error" id="err-q28">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12" y2="16"/></svg>
+            <span data-en="Please select a rating." data-de="Bitte wählen Sie eine Bewertung aus.">Please select a rating.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ERROR BANNER -->
+    <div class="form-error-banner" id="form-error-banner">
+      <span data-en="⚠ Please complete all required fields before submitting." data-de="⚠ Bitte füllen Sie alle Pflichtfelder aus, bevor Sie absenden.">⚠ Please complete all required fields before submitting.</span>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-area">
+      <button type="submit" class="btn-submit" id="btn-submit">
+        <span data-en="Submit Response" data-de="Antwort absenden">Submit Response</span>
+      </button>
+    </div>
+
+  </form>
+
+  </section>
+  <!-- /TAB 3 -->
+
+  <!-- TAB 4 · SUBMISSION -->
+  <section class="tab-panel" data-tab-panel="4">
+
+    <div class="demo-video-card" id="submission-pending">
+      <div class="demo-video-step" data-en="Step 4 · Submission" data-de="Schritt 4 · Absenden">Step 4 · Submission</div>
+      <h2 class="demo-video-title" data-en="Ready to submit" data-de="Bereit zum Absenden">Ready to submit</h2>
+      <p class="demo-video-sub" data-en="Complete the questionnaire on Step 3, then press the Submit button. Your confirmation will appear here." data-de="Füllen Sie den Fragebogen in Schritt 3 aus und klicken Sie auf die Schaltfläche „Absenden“. Ihre Bestätigung erscheint hier.">Complete the questionnaire on Step 3, then press the Submit button. Your confirmation will appear here.</p>
+    </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">
+      <svg width="32" height="32" fill="none" stroke="#16a34a" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 data-en="Thank you for your response!" data-de="Vielen Dank für Ihre Antwort!">Thank you for your response!</h2>
+    <p data-en="Your feedback has been recorded and will contribute to Kumar Viswajeet's evaluation of the chatbot prototype as part of an MSc Artificial Intelligence dissertation. Your responses are fully anonymised." data-de="Ihr Feedback wurde gespeichert und trägt zu Kumar Viswajeets Bewertung des Chatbot-Prototyps im Rahmen einer MSc-Dissertation im Bereich Künstliche Intelligenz bei. Ihre Antworten sind vollständig anonymisiert.">Your feedback has been recorded and will contribute to Kumar Viswajeet's evaluation of the chatbot prototype as part of an MSc Artificial Intelligence dissertation. Your responses are fully anonymised.</p>
+    <div class="success-share" id="success-share">
+      <div class="success-share-title" data-en="Share This Questionnaire" data-de="Diesen Fragebogen teilen">Share This Questionnaire</div>
+      <p class="success-share-text" data-en="If useful, you can share it with your college or share the link directly." data-de="Wenn hilfreich, können Sie ihn mit Ihrer Hochschule teilen oder den Link direkt weitergeben.">If useful, you can share it with your college or share the link directly.</p>
+      <div class="success-share-actions">
+        <button type="button" class="btn-share btn-share-primary" id="btn-share-college" data-en="Share with College (Email)" data-de="Mit Hochschule teilen (E-Mail)">Share with College (Email)</button>
+        <button type="button" class="btn-share btn-share-secondary" id="btn-share-link" data-en="Share Link" data-de="Link teilen">Share Link</button>
+      </div>
+      <div class="share-status" id="share-status" aria-live="polite"></div>
+    </div>
+    <div class="success-restart">
+      <a href="/" class="btn-share btn-share-secondary" id="btn-restart" data-en="Back to start (new response)" data-de="Zur Startseite (neue Antwort)">Back to start (new response)</a>
+    </div>
+  </div>
+
+  </section>
+  <!-- /TAB 4 -->
+
+</main>
+
+<footer class="form-footer">
+  <span data-en="BSBI · Kumar Viswajeet · Supervisor: Dr Vincent English · MSc Artificial Intelligence Dissertation · Responses are anonymised · Berlin, 2025–26" data-de="BSBI · Kumar Viswajeet · Betreuer: Dr Vincent English · MSc Künstliche Intelligenz Dissertation · Antworten werden anonymisiert · Berlin, 2025–26">BSBI · Kumar Viswajeet · Supervisor: Dr Vincent English · MSc Artificial Intelligence Dissertation · Responses are anonymised · Berlin, 2025–26</span>
+  <br>
+  <a href="mailto:kumarviswajeet6@gmail.com" style="color:var(--accent);text-decoration:none;font-weight:600;">kumarviswajeet6@gmail.com</a>
+</footer>
+
+<script>
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyzSqudnyc12apcRZdRtABVdRjYI-_xDrgJbgsTfkrzHXOn6FTHykoNa_m5q73P8RkT/exec';
+const SHARE_URL_FALLBACK = 'https://kv8936.github.io/kv-chatbot/';
+const FLOW_STATE_KEY = 'survey_flow_state_v1';
+const FORM_STATE_KEY = 'survey_form_state_v1';
+const FLOW_RETURN_STEP_KEY = 'survey_flow_return_step3_v1';
+
+const defaultFlowState = Object.freeze({
+  currentStep: 1,
+  step2Opened: false,
+  step3Opened: false
+});
+
+let flowState = { ...defaultFlowState };
+
+const flowWorkspaceCopy = {
+  1: {
+    step: {
+      en: 'Step 1 · Watch Demo Video',
+      de: 'Schritt 1 · Demo-Video ansehen'
+    },
+    title: {
+      en: 'Watch Demo Video',
+      de: 'Demo-Video ansehen'
+    },
+    subtitle: {
+      en: 'Watch the demo first. Then continue with Step 2 to try the chatbot.',
+      de: 'Sehen Sie zuerst die Demo an. Fahren Sie dann mit Schritt 2 fort, um den Chatbot zu testen.'
+    },
+    src: '/chatbot/Video/Guide.mp4'
+  },
+  2: {
+    step: {
+      en: 'Step 2 · Chatbot Check',
+      de: 'Schritt 2 · Chatbot-Check'
+    },
+    title: {
+      en: 'Open Chatbot (Same Tab)',
+      de: 'Chatbot Oeffnen (Gleicher Tab)'
+    },
+    subtitle: {
+      en: 'Step 2 opens the chatbot in the same tab. After testing, use Step 3 to return here.',
+      de: 'Schritt 2 oeffnet den Chatbot im gleichen Tab. Nach dem Testen verwenden Sie Schritt 3, um hierher zurueckzukehren.'
+    },
+    srcdoc: true,
+    docType: 'chatbot-same-tab',
+    openUrl: '/chatbot/'
+  },
+  3: {
+    step: {
+      en: 'Step 3 · Back to Questionnaire',
+      de: 'Schritt 3 · Zurück zum Fragebogen'
+    },
+    title: {
+      en: 'Back to Questionnaire',
+      de: 'Zurück zum Fragebogen'
+    },
+    subtitle: {
+      en: 'Return from the chatbot and complete the questionnaire before final submission.',
+      de: 'Kehren Sie vom Chatbot zurück und füllen Sie den Fragebogen vor dem finalen Absenden aus.'
+    },
+    srcdoc: true,
+    docType: 'review'
+  }
+};
+
+// ─────────────────────────────────────────────
+// LIKERT STATEMENTS
+// ─────────────────────────────────────────────
+const likertItems = [
+  { name: 'l1',  construct: 'Ease of use',           en: 'The chatbot was easy to use.',                                                                   de: 'Der Chatbot war einfach zu bedienen.' },
+  { name: 'l2',  construct: 'Ease of use',           en: 'I was able to navigate the chatbot without difficulty.',                                          de: 'Ich konnte den Chatbot problemlos navigieren.' },
+  { name: 'l3',  construct: 'Instructions',          en: 'The instructions for using the chatbot were clear.',                                              de: 'Die Anweisungen zur Nutzung des Chatbots waren klar.' },
+  { name: 'l4',  construct: 'Instructions',          en: 'I understood what information I needed to enter into the chatbot.',                                de: 'Ich verstand, welche Informationen ich in den Chatbot eingeben musste.' },
+  { name: 'l5',  construct: 'Clarity',               en: "The chatbot's responses were easy to understand.",                                                de: 'Die Antworten des Chatbots waren leicht verständlich.' },
+  { name: 'l6',  construct: 'Clarity',               en: 'The chatbot used language that was appropriate for a workplace safety context.',                   de: 'Der Chatbot verwendete eine für den Arbeitsschutzkontext angemessene Sprache.' },
+  { name: 'l7',  construct: 'Clarity',               en: "The chatbot's response was difficult to understand.",                                             de: 'Die Antwort des Chatbots war schwer zu verstehen.', reverse: true },
+  { name: 'l8',  construct: 'Hazard identification', en: 'The hazard category provided by the chatbot seemed relevant.',                                     de: 'Die vom Chatbot genannte Gefahrenkategorie schien relevant.' },
+  { name: 'l9',  construct: 'Hazard identification', en: 'The chatbot correctly recognised the main safety issue in the scenario.',                           de: 'Der Chatbot erkannte das Hauptsicherheitsproblem im Szenario korrekt.' },
+  { name: 'l10', construct: 'Risk assessment',       en: 'The risk level provided by the chatbot seemed reasonable.',                                        de: 'Das vom Chatbot angegebene Risikoniveau schien angemessen.' },
+  { name: 'l11', construct: 'Risk assessment',       en: "The chatbot's risk assessment matched my own judgement of the scenario.",                          de: 'Die Risikobewertung des Chatbots stimmte mit meiner eigenen Einschätzung des Szenarios überein.' },
+  { name: 'l12', construct: 'Safety action',         en: 'The recommended safety action was practical.',                                                     de: 'Die empfohlene Sicherheitsmaßnahme war praktisch umsetzbar.' },
+  { name: 'l13', construct: 'Safety action',         en: 'The chatbot provided useful guidance on what action should be taken next.',                         de: 'Der Chatbot lieferte nützliche Hinweise, welche Maßnahmen als Nächstes ergriffen werden sollten.' },
+  { name: 'l14', construct: 'Escalation',            en: 'The chatbot clearly explained whether escalation was needed.',                                      de: 'Der Chatbot erklärte klar, ob eine Eskalation erforderlich war.' },
+  { name: 'l15', construct: 'Escalation',            en: 'The escalation recommendation was appropriate for the seriousness of the hazard.',                 de: 'Die Eskalationsempfehlung war dem Schweregrad der Gefahr angemessen.' },
+  { name: 'l16', construct: 'Decision support',      en: 'The chatbot helped me understand the workplace hazard more clearly.',                               de: 'Der Chatbot half mir, die Arbeitsgefahr besser zu verstehen.' },
+  { name: 'l17', construct: 'Decision support',      en: 'The chatbot supported my thinking when considering how to respond to the hazard.',                  de: 'Der Chatbot unterstützte mein Denken bei der Überlegung, wie auf die Gefahr reagiert werden soll.' },
+  { name: 'l18', construct: 'Trust',                 en: 'I would trust the chatbot as an early-stage safety support tool.',                                  de: 'Ich würde dem Chatbot als frühzeitigem Sicherheitsunterstützungstool vertrauen.' },
+  { name: 'l19', construct: 'Trust',                 en: "I would be unsure about relying on the chatbot's recommendation for initial safety screening.",     de: 'Ich wäre unsicher, ob ich mich auf die Empfehlung des Chatbots für die erste Sicherheitsprüfung verlassen würde.', reverse: true },
+  { name: 'l20', construct: 'Usefulness',            en: 'The chatbot could be useful for basic workplace safety screening.',                                 de: 'Der Chatbot könnte für die grundlegende Arbeitssicherheitsüberprüfung nützlich sein.' },
+];
+
+const starLabels = {
+  en: { 1: 'Not useful at all', 2: 'Slightly useful', 3: 'Moderately useful', 4: 'Very useful', 5: 'Extremely useful' },
+  de: { 1: 'Überhaupt nicht nützlich', 2: 'Wenig nützlich', 3: 'Mäßig nützlich', 4: 'Sehr nützlich', 5: 'Äußerst nützlich' }
+};
+
+const shareStatusText = {
+  en: {
+    copied: 'Link copied to clipboard.',
+    shared: 'Share dialog opened.',
+    email: 'Email app opened with draft message.',
+    failed: 'Could not share automatically. Please copy the link manually.'
+  },
+  de: {
+    copied: 'Link in die Zwischenablage kopiert.',
+    shared: 'Teilen-Dialog geöffnet.',
+    email: 'E-Mail-App mit Entwurf geöffnet.',
+    failed: 'Automatisches Teilen nicht möglich. Bitte Link manuell kopieren.'
+  }
+};
+
+// ─────────────────────────────────────────────
+// LANGUAGE SYSTEM
+// ─────────────────────────────────────────────
+let currentLang = localStorage.getItem('survey_lang') || 'en';
+
+function setLang(lang, fromChatbot) {
+  currentLang = lang;
+  localStorage.setItem('survey_lang', lang);
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val !== null) el.innerHTML = val;
+  });
+
+  // Update textarea placeholders
+  const placeholders = {
+    en: { q24: 'e.g. The hazard category and escalation recommendation were most helpful…', q25: 'e.g. The risk level description was hard to interpret…', q26: 'e.g. No mention of PPE requirements…', q27: 'e.g. Adding image upload capability would help…' },
+    de: { q24: 'z.B. Die Gefahrenkategorie und die Eskalationsempfehlung waren am hilfreichsten…', q25: 'z.B. Die Beschreibung des Risikoniveaus war schwer zu interpretieren…', q26: 'z.B. Keine Erwähnung von PSA-Anforderungen…', q27: 'z.B. Das Hinzufügen einer Bildupload-Funktion wäre hilfreich…' }
+  };
+  ['q24','q25','q26','q27'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = placeholders[lang][id];
+  });
+
+  // Update star label if selected
+  const sel = document.querySelector('input[name="q28_rating"]:checked');
+  if (sel) updateStarLabel(parseInt(sel.value));
+
+  // Toggle buttons
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-de').classList.toggle('active', lang === 'de');
+  document.getElementById('btn-en').setAttribute('aria-pressed', lang === 'en');
+  document.getElementById('btn-de').setAttribute('aria-pressed', lang === 'de');
+
+  renderFlowWorkspace(flowState.currentStep);
+
+  const shareStatus = document.getElementById('share-status');
+  if (shareStatus) shareStatus.textContent = '';
+
+  // Keep the embedded chatbot's EN/DE toggle (Tab 2) in sync.
+  if (!fromChatbot) {
+    const cf = document.getElementById('chatbot-frame');
+    if (cf && cf.contentWindow) {
+      try { cf.contentWindow.postMessage({ type: 'set-lang', lang }, window.location.origin); } catch (e) {}
+    }
+  }
+}
+
+function buildReviewWorkspaceDoc(lang) {
+  const isDe = lang === 'de';
+
+  return `<!doctype html>
+<html lang="${isDe ? 'de' : 'en'}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .panel {
+      padding: 18px;
+    }
+    .chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #2563eb;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 10px;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #0f1f3d;
+    }
+    p {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #475569;
+    }
+    ol {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 14px;
+      color: #1e293b;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="chip">${isDe ? 'Schritt 3' : 'Step 3'}</div>
+    <h3>${isDe ? 'Zurück zum Fragebogen' : 'Back To The Questionnaire'}</h3>
+    <p>${isDe ? 'Kehren Sie aus dem Chatbot zurück und prüfen Sie Ihre Antworten vor dem Absenden.' : 'Return from the chatbot and review your responses before submission.'}</p>
+    <ol>
+      <li>${isDe ? 'Notieren Sie, ob Gefahrenkategorie und Risikoniveau sinnvoll waren.' : 'Capture whether the hazard category and risk level were useful.'}</li>
+      <li>${isDe ? 'Übernehmen Sie Ihre Beobachtungen in den Fragebogen.' : 'Transfer your observations into the questionnaire.'}</li>
+      <li>${isDe ? 'Gehen Sie zu Schritt 4 und senden Sie den Fragebogen ab.' : 'Go to Step 4 and submit the questionnaire.'}</li>
+    </ol>
+  </div>
+</body>
+</html>`;
+}
+
+function buildExternalChatbotDoc(lang) {
+  const isDe = lang === 'de';
+
+  return `<!doctype html>
+<html lang="${isDe ? 'de' : 'en'}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    .panel {
+      padding: 18px;
+    }
+    .chip {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #2563eb;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 10px;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #0f1f3d;
+    }
+    p {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #475569;
+    }
+    a {
+      color: #2563eb;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="chip">${isDe ? 'Schritt 2' : 'Step 2'}</div>
+    <h3>${isDe ? 'Chatbot im gleichen Tab' : 'Chatbot In Same Tab'}</h3>
+    <p>${isDe ? 'Schritt 2 oeffnet den Chatbot im gleichen Tab. Nach dem Testen kehren Sie mit Schritt 3 zum Fragebogen zurueck.' : 'Step 2 opens the chatbot in the same tab. After testing, use Step 3 to return to the questionnaire.'}</p>
+    <p><a href="/chatbot/">${isDe ? 'Chatbot jetzt oeffnen' : 'Open chatbot now'}</a></p>
+  </div>
+</body>
+</html>`;
+}
+
+function getFlowWorkspaceStep(step) {
+  return 1;
+}
+
+function renderFlowWorkspace(step) {
+  const workspaceStep = getFlowWorkspaceStep(step);
+  const copy = flowWorkspaceCopy[workspaceStep];
+
+  const chip = document.getElementById('workspace-step-chip');
+  const title = document.getElementById('demo-video-title');
+  const subtitle = document.getElementById('workspace-sub');
+  const frame = document.getElementById('workflow-iframe');
+
+  if (chip) {
+    chip.setAttribute('data-en', copy.step.en);
+    chip.setAttribute('data-de', copy.step.de);
+    chip.textContent = currentLang === 'de' ? copy.step.de : copy.step.en;
+  }
+
+  if (title) {
+    title.setAttribute('data-en', copy.title.en);
+    title.setAttribute('data-de', copy.title.de);
+    title.textContent = currentLang === 'de' ? copy.title.de : copy.title.en;
+  }
+
+  if (subtitle) {
+    subtitle.setAttribute('data-en', copy.subtitle.en);
+    subtitle.setAttribute('data-de', copy.subtitle.de);
+    subtitle.textContent = currentLang === 'de' ? copy.subtitle.de : copy.subtitle.en;
+  }
+
+  if (frame) {
+    frame.removeAttribute('srcdoc');
+    frame.src = flowWorkspaceCopy[1].src;
+  }
+}
+
+function getShareUrl() {
+  if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+    return window.location.href.split('#')[0];
+  }
+  return SHARE_URL_FALLBACK;
+}
+
+function getSharePayload() {
+  const url = getShareUrl();
+  if (currentLang === 'de') {
+    return {
+      title: 'MSc-KI-Fragebogen zur Chatbot-Bewertung',
+      text: 'Bitte sehen Sie sich diesen Forschungsfragebogen zur Bewertung eines Sicherheits-Chatbots an.',
+      url
+    };
+  }
+  return {
+    title: 'MSc AI Questionnaire for Chatbot Evaluation',
+    text: 'Please review this research questionnaire for evaluating a workplace safety chatbot prototype.',
+    url
+  };
+}
+
+function setShareStatus(key) {
+  const el = document.getElementById('share-status');
+  if (!el) return;
+  el.textContent = (shareStatusText[currentLang] && shareStatusText[currentLang][key]) || '';
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  const copied = document.execCommand('copy');
+  document.body.removeChild(ta);
+  return copied;
+}
+
+function setupShareActions() {
+  const btnEmail = document.getElementById('btn-share-college');
+  const btnLink = document.getElementById('btn-share-link');
+
+  const btnRestart = document.getElementById('btn-restart');
+  if (btnRestart) {
+    btnRestart.addEventListener('click', () => {
+      try {
+        localStorage.removeItem(FLOW_STATE_KEY);
+        localStorage.removeItem(FORM_STATE_KEY);
+      } catch (e) {}
+    });
+  }
+
+  if (btnEmail) {
+    btnEmail.addEventListener('click', () => {
+      const payload = getSharePayload();
+      const subject = currentLang === 'de'
+        ? 'MSc-KI-Fragebogen zur Bewertung eines Sicherheits-Chatbots'
+        : 'MSc AI questionnaire for workplace safety chatbot evaluation';
+      const body = currentLang === 'de'
+        ? 'Ich teile diesen akademischen Fragebogen zur Chatbot-Bewertung.\n\n' + payload.url
+        : 'I am sharing this academic questionnaire for chatbot evaluation.\n\n' + payload.url;
+
+      window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      setShareStatus('email');
+    });
+  }
+
+  if (btnLink) {
+    btnLink.addEventListener('click', async () => {
+      const payload = getSharePayload();
+
+      if (navigator.share) {
+        try {
+          await navigator.share(payload);
+          setShareStatus('shared');
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return;
+        }
+      }
+
+      const copied = await copyText(payload.url);
+      setShareStatus(copied ? 'copied' : 'failed');
+    });
+  }
+}
+
+function normalizeFlowState(raw) {
+  if (!raw || typeof raw !== 'object') return { ...defaultFlowState };
+
+  const currentStep = Number(raw.currentStep);
+
+  return {
+    currentStep: Number.isFinite(currentStep) ? Math.min(4, Math.max(1, Math.round(currentStep))) : 1,
+    step2Opened: Boolean(raw.step2Opened),
+    step3Opened: Boolean(raw.step3Opened)
+  };
+}
+
+function loadFlowState() {
+  try {
+    const raw = localStorage.getItem(FLOW_STATE_KEY);
+    if (!raw) {
+      flowState = { ...defaultFlowState };
+      return;
+    }
+    flowState = normalizeFlowState(JSON.parse(raw));
+  } catch {
+    flowState = { ...defaultFlowState };
+  }
+  // After a successful submission, reloading the page returns to the start (homepage)
+  // instead of getting stuck on the one-way Submission step.
+  if (flowState.currentStep >= 4) {
+    flowState = { ...defaultFlowState };
+  }
+}
+
+function applyPendingStep3Return() {
+  const pending = localStorage.getItem(FLOW_RETURN_STEP_KEY);
+  if (pending !== '1') return;
+
+  flowState.step2Opened = true;
+  flowState.step3Opened = true;
+  flowState.currentStep = Math.max(flowState.currentStep, 3);
+  localStorage.removeItem(FLOW_RETURN_STEP_KEY);
+  saveFlowState();
+}
+
+function saveFlowState() {
+  localStorage.setItem(FLOW_STATE_KEY, JSON.stringify(flowState));
+}
+
+function getMaxUnlockedStep() {
+  // Sequential workflow: each step unlocks only after the previous one is visited.
+  // Step 1 -> 2 (watch demo, then try the chatbot); 2 -> 3 only once the chatbot tab
+  // has been opened (no skipping straight to the questionnaire); step 4 only via submit.
+  if (flowState.submitted) return 4;
+  if (flowState.step2Opened) return 3;
+  return 2;
+}
+
+function setFlowLinkEnabled(el, enabled) {
+  if (!el) return;
+  el.classList.toggle('is-disabled', !enabled);
+  el.setAttribute('aria-disabled', String(!enabled));
+  el.tabIndex = enabled ? 0 : -1;
+}
+
+function renderFlowStepper() {
+  const nodes = document.querySelectorAll('.flow-step[data-flow-step]');
+  const submitted = !!flowState.submitted;
+  const maxUnlocked = getMaxUnlockedStep();
+
+  nodes.forEach((node) => {
+    const step = Number(node.getAttribute('data-flow-step'));
+    if (!Number.isFinite(step)) return;
+
+    const active = !submitted && step === flowState.currentStep;
+    const complete = submitted || step < flowState.currentStep;   // passed/submitted -> checkmark (one-way)
+    const upcoming = !active && !complete;
+    // Sequential: a not-yet-unlocked step (and Submission before submit) is locked.
+    const locked = upcoming && step > maxUnlocked;
+
+    node.classList.toggle('is-active', active);
+    node.classList.toggle('is-complete', complete);
+    node.classList.toggle('is-upcoming', upcoming);
+    node.classList.toggle('is-locked', locked);
+
+    const numEl = node.querySelector('.flow-step__num');
+    if (numEl) numEl.textContent = complete ? '\u2713' : String(step);
+
+    const disabled = complete || locked;
+    node.setAttribute('aria-disabled', String(disabled));
+    node.tabIndex = disabled ? -1 : 0;
+
+    if (active) node.setAttribute('aria-current', 'step');
+    else node.removeAttribute('aria-current');
+  });
+}
+
+function setFlowStep(step, options = {}) {
+  const requested = Number(step);
+  if (!Number.isFinite(requested)) return;
+
+  const normalized = Math.min(4, Math.max(1, Math.round(requested)));
+  const maxUnlocked = getMaxUnlockedStep();
+
+  flowState.currentStep = options.force ? normalized : Math.min(normalized, maxUnlocked);
+  // Record progression so the next step unlocks sequentially (visiting 2 unlocks 3, etc.).
+  if (flowState.currentStep >= 2) flowState.step2Opened = true;
+  if (flowState.currentStep >= 3) flowState.step3Opened = true;
+  saveFlowState();
+  renderFlowStepper();
+}
+
+function unlockFlowStep(step) {
+  if (step >= 2) flowState.step2Opened = true;
+  if (step >= 3) flowState.step3Opened = true;
+  flowState.currentStep = Math.max(flowState.currentStep, Math.min(4, step));
+  saveFlowState();
+  renderFlowStepper();
+}
+
+function renderActivePanel() {
+  const step = flowState.currentStep;
+
+  document.querySelectorAll('.tab-panel').forEach((panel) => {
+    const panelStep = Number(panel.getAttribute('data-tab-panel'));
+    panel.classList.toggle('is-active', panelStep === step);
+  });
+
+  // The chatbot tab fills the full content width (no reading-column cap).
+  const mainEl = document.querySelector('main');
+  if (mainEl) mainEl.classList.toggle('main--chatbot', step === 2);
+
+  // Lazy-load the embedded chatbot the first time Step 2 is opened.
+  if (step === 2) {
+    const frame = document.getElementById('chatbot-frame');
+    if (frame && !frame.getAttribute('src') && frame.dataset.src) {
+      frame.setAttribute('src', frame.dataset.src);
+    }
+  }
+
+  // Pause the demo video when leaving Step 1.
+  if (step !== 1) {
+    const video = document.getElementById('workflow-video');
+    if (video && typeof video.pause === 'function') video.pause();
+  }
+}
+
+function showTab(step, options = {}) {
+  setFlowStep(step, { force: true });
+  renderActivePanel();
+  if (step === 2) setTimeout(sizeChatbotFrameToContent, 60);
+  if (options.scroll !== false) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function onFlowNavigationClick(event) {
+  event.preventDefault();
+  const step = Number(event.currentTarget.getAttribute('data-flow-step'));
+  if (!Number.isFinite(step)) return;
+  // One-way street: no going back to a completed step.
+  if (step < flowState.currentStep) return;
+  // Sequential: cannot skip ahead past the next unlocked step (no jumping to the questionnaire).
+  if (step > getMaxUnlockedStep()) return;
+  // Submission is reached only by submitting the questionnaire, not by clicking ahead.
+  if (step === 4 && !flowState.submitted) return;
+  showTab(step);
+}
+
+function setupFlowNavigation() {
+  document.querySelectorAll('[data-flow-step]').forEach((node) => {
+    node.addEventListener('click', onFlowNavigationClick);
+  });
+}
+
+// ─── Embedded chatbot (Tab 2): size the iframe to its content so the whole page
+// scrolls as ONE window (no nested iframe scrollbar), and bridge the chatbot's
+// "Back to questionnaire" button to Tab 3 without navigating the iframe. ───
+let chatbotResizeObserver = null;
+function sizeChatbotFrameToContent() {
+  const frame = document.getElementById('chatbot-frame');
+  if (!frame || frame.offsetParent === null) return;
+  try {
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const h = Math.max(
+      doc.body ? doc.body.scrollHeight : 0,
+      doc.documentElement ? doc.documentElement.scrollHeight : 0
+    );
+    if (h > 0) frame.style.height = h + 'px';
+  } catch (e) { /* iframe not ready */ }
+}
+function setupChatbotEmbed() {
+  const frame = document.getElementById('chatbot-frame');
+  if (frame) {
+    frame.addEventListener('load', () => {
+      sizeChatbotFrameToContent();
+      try {
+        const doc = frame.contentDocument;
+        if (doc && 'ResizeObserver' in window) {
+          if (chatbotResizeObserver) chatbotResizeObserver.disconnect();
+          chatbotResizeObserver = new ResizeObserver(() => sizeChatbotFrameToContent());
+          chatbotResizeObserver.observe(doc.documentElement);
+        }
+      } catch (e) { /* cross-origin guard */ }
+      [250, 700, 1500].forEach((d) => setTimeout(sizeChatbotFrameToContent, d));
+    });
+    window.addEventListener('resize', sizeChatbotFrameToContent);
+  }
+  // Messages from the embedded chatbot (Tab 2): back-to-questionnaire + language sync.
+  window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    const data = event.data;
+    if (!data) return;
+    if (data.type === 'open-questionnaire-tab') {
+      showTab(3);
+    } else if (data.type === 'set-lang') {
+      const l = data.lang === 'de' ? 'de' : 'en';
+      if (l !== currentLang) setLang(l, true);
+    } else if (data.type === 'request-lang') {
+      const cf = document.getElementById('chatbot-frame');
+      if (cf && cf.contentWindow) {
+        try { cf.contentWindow.postMessage({ type: 'set-lang', lang: currentLang }, window.location.origin); } catch (e) {}
+      }
+    }
+  });
+}
+
+function saveFormState() {
+  const form = document.getElementById('survey-form');
+  if (!form) return;
+
+  const state = {};
+
+  form.querySelectorAll('input, textarea, select').forEach((field) => {
+    if (!field || field.type === 'hidden') return;
+
+    const key = field.name || field.id;
+    if (!key) return;
+
+    if (field.type === 'radio') {
+      if (field.checked) state[key] = field.value;
+      return;
+    }
+
+    if (field.type === 'checkbox') {
+      state[key] = field.checked;
+      return;
+    }
+
+    state[key] = field.value;
+  });
+
+  const consent = document.getElementById('consent-cb');
+  if (consent) state['consent-cb'] = consent.checked;
+
+  localStorage.setItem(FORM_STATE_KEY, JSON.stringify(state));
+}
+
+function restoreFormState() {
+  const raw = localStorage.getItem(FORM_STATE_KEY);
+  if (!raw) return;
+
+  let state;
+  try {
+    state = JSON.parse(raw);
+  } catch {
+    return;
+  }
+
+  if (!state || typeof state !== 'object') return;
+
+  Object.entries(state).forEach(([key, value]) => {
+    if (key === 'consent-cb') {
+      const consent = document.getElementById('consent-cb');
+      if (consent) consent.checked = Boolean(value);
+      return;
+    }
+
+    const byName = document.getElementsByName(key);
+    if (byName && byName.length > 0) {
+      const sample = byName[0];
+      if (sample.type === 'radio') {
+        Array.from(byName).forEach((input) => {
+          input.checked = String(input.value) === String(value);
+        });
+        return;
+      }
+
+      if (sample.type === 'checkbox') {
+        sample.checked = Boolean(value);
+        return;
+      }
+
+      sample.value = typeof value === 'string' ? value : '';
+      return;
+    }
+
+    const byId = document.getElementById(key);
+    if (!byId) return;
+
+    if (byId.type === 'checkbox') byId.checked = Boolean(value);
+    else if (byId.type === 'radio') byId.checked = String(byId.value) === String(value);
+    else byId.value = typeof value === 'string' ? value : '';
+  });
+}
+
+function setupFormPersistence() {
+  const form = document.getElementById('survey-form');
+  if (form) {
+    form.addEventListener('input', saveFormState);
+    form.addEventListener('change', saveFormState);
+  }
+
+  const consent = document.getElementById('consent-cb');
+  if (consent) consent.addEventListener('change', saveFormState);
+}
+
+// ─────────────────────────────────────────────
+// BUILD LIKERT TABLE
+// ─────────────────────────────────────────────
+function buildLikert() {
+  const tbodyA = document.getElementById('likert-body-a');
+  const tbodyB = document.getElementById('likert-body-b');
+  tbodyA.innerHTML = '';
+  tbodyB.innerHTML = '';
+
+  const likertColLabels = {
+    en: { 1: 'Strongly Disagree', 2: 'Disagree', 3: 'Neutral', 4: 'Agree', 5: 'Strongly Agree' },
+    de: { 1: 'Stimme überhaupt nicht zu', 2: 'Stimme nicht zu', 3: 'Neutral', 4: 'Stimme zu', 5: 'Stimme voll zu' }
+  };
+
+  likertItems.forEach((item, i) => {
+    const targetBody = i < 7 ? tbodyA : tbodyB;
+    const qNum = 'Q' + (i + 4);
+    const enText = qNum + '. ' + item.en;
+    const deText = qNum + '. ' + item.de;
+    const tr = document.createElement('tr');
+    const tdStmt = document.createElement('td');
+    tdStmt.className = 'stmt-cell';
+    tdStmt.setAttribute('data-en', enText);
+    tdStmt.setAttribute('data-de', deText);
+    tdStmt.textContent = (currentLang === 'de' ? deText : enText);
+    tr.appendChild(tdStmt);
+    for (let v = 1; v <= 5; v++) {
+      const td = document.createElement('td');
+      const label = document.createElement('label');
+      label.className = 'likert-radio';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = item.name;
+      input.value = v;
+      input.setAttribute('aria-label', enText + ' — ' + likertColLabels.en[v]);
+      input.addEventListener('change', updateProgress);
+      const optText = document.createElement('span');
+      optText.className = 'likert-radio-text';
+      optText.setAttribute('data-en', v + '. ' + likertColLabels.en[v]);
+      optText.setAttribute('data-de', v + '. ' + likertColLabels.de[v]);
+      optText.textContent = v + '. ' + (currentLang === 'de' ? likertColLabels.de[v] : likertColLabels.en[v]);
+      label.appendChild(input);
+      label.appendChild(optText);
+      td.appendChild(label);
+      tr.appendChild(td);
+    }
+    targetBody.appendChild(tr);
+  });
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS BAR
+// ─────────────────────────────────────────────
+function countRequiredAnswered() {
+  let answered = 0;
+  const total = 1 + 3 + likertItems.length + 1 + 1; // consent + q1+q2+q3 + likert + q24 + q28
+
+  if (document.getElementById('consent-cb').checked) answered++;
+  ['q1','q2','q3'].forEach(name => {
+    if (document.querySelector(`input[name="${name}"]:checked`)) answered++;
+  });
+  likertItems.forEach(item => {
+    if (document.querySelector(`input[name="${item.name}"]:checked`)) answered++;
+  });
+  if (document.getElementById('q24').value.trim()) answered++;
+  if (document.querySelector('input[name="q28_rating"]:checked')) answered++;
+
+  return { answered, total };
+}
+
+function updateProgress() {
+  const { answered, total } = countRequiredAnswered();
+  const pct = Math.min(100, Math.round((answered / total) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = pct + '%';
+  const pbar = document.querySelector('.flow-step__progress');
+  if (pbar) {
+    pbar.setAttribute('aria-valuenow', pct);
+    pbar.classList.toggle('is-full', pct === 100);
+  }
+
+  // Hide consent error as soon as user checks the box.
+  const consentCb = document.getElementById('consent-cb');
+  const consentErr = document.getElementById('err-consent');
+  if (consentCb && consentErr && consentCb.checked) {
+    consentErr.classList.remove('visible');
+  }
+}
+
+// ─────────────────────────────────────────────
+// STAR RATING LABEL
+// ─────────────────────────────────────────────
+function updateStarLabel(val) {
+  const el = document.getElementById('star-label-text');
+  el.textContent = starLabels[currentLang][val] || '';
+}
+
+// ─────────────────────────────────────────────
+// VALIDATION
+// ─────────────────────────────────────────────
+function validate() {
+  let valid = true;
+
+  // Consent
+  const cb = document.getElementById('consent-cb');
+  const errConsent = document.getElementById('err-consent');
+  if (!cb.checked) {
+    errConsent.classList.add('visible');
+    valid = false;
+  } else {
+    errConsent.classList.remove('visible');
+  }
+
+  // Q1, Q2, Q3
+  ['q1','q2','q3'].forEach(name => {
+    const err = document.getElementById('err-' + name);
+    const sel = document.querySelector(`input[name="${name}"]:checked`);
+    if (!sel) { err.classList.add('visible'); valid = false; }
+    else err.classList.remove('visible');
+  });
+
+  // Likert — all 20 required
+  const likertErr = document.getElementById('err-likert');
+  let allLikert = true;
+  likertItems.forEach(item => {
+    if (!document.querySelector(`input[name="${item.name}"]:checked`)) allLikert = false;
+  });
+  if (!allLikert) { likertErr.classList.add('visible'); valid = false; }
+  else likertErr.classList.remove('visible');
+
+  // Q24
+  const q24val = document.getElementById('q24').value.trim();
+  const errQ24 = document.getElementById('err-q24');
+  if (!q24val) { errQ24.classList.add('visible'); document.getElementById('qb-q24').classList.add('has-error'); valid = false; }
+  else { errQ24.classList.remove('visible'); document.getElementById('qb-q24').classList.remove('has-error'); }
+
+  // Q28
+  const errQ28 = document.getElementById('err-q28');
+  if (!document.querySelector('input[name="q28_rating"]:checked')) {
+    errQ28.classList.add('visible'); valid = false;
+  } else {
+    errQ28.classList.remove('visible');
+  }
+
+  return valid;
+}
+
+// ─────────────────────────────────────────────
+// FORM SUBMIT
+// ─────────────────────────────────────────────
+document.getElementById('survey-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const banner = document.getElementById('form-error-banner');
+
+  if (!validate()) {
+    banner.classList.add('visible');
+    // Scroll to first error
+    const firstErr = document.querySelector('.field-error.visible');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  banner.classList.remove('visible');
+
+  // Set hidden fields
+  document.getElementById('field-lang').value = currentLang === 'en' ? 'English' : 'German';
+  document.getElementById('field-ts').value = new Date().toISOString();
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.querySelector('span').setAttribute('data-en', 'Submitting…');
+  btn.querySelector('span').setAttribute('data-de', 'Wird gesendet…');
+  btn.querySelector('span').textContent = currentLang === 'en' ? 'Submitting…' : 'Wird gesendet…';
+
+  // Build FormData
+  const fd = new FormData(this);
+
+  try {
+    // Send the questionnaire response to Google Sheets through Google Apps Script.
+    // mode: 'no-cors' avoids browser CORS blocking with Apps Script web apps.
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      body: fd,
+      mode: 'no-cors'
+    });
+
+    localStorage.removeItem(FORM_STATE_KEY);
+
+    // Empty the questionnaire tab now that it is submitted.
+    document.getElementById('survey-form').style.display = 'none';
+    document.querySelector('.consent-banner').style.display = 'none';
+    document.querySelector('.consent-check-row').style.display = 'none';
+    document.getElementById('err-consent').style.display = 'none';
+    const qProgress = document.querySelector('.questionnaire-progress');
+    if (qProgress) qProgress.style.display = 'none';
+    const instNote = document.querySelector('.institution-note');
+    if (instNote) instNote.style.display = 'none';
+
+    // Hide the "ready to submit" placeholder on the Submission tab.
+    const pending = document.getElementById('submission-pending');
+    if (pending) pending.style.display = 'none';
+
+    const s = document.getElementById('success-screen');
+    s.classList.add('visible');
+
+    // Update success text for selected language
+    s.querySelectorAll('[data-en]').forEach(el => {
+      el.innerHTML = el.getAttribute('data-' + currentLang) || el.innerHTML;
+    });
+
+    // Mark the flow as submitted (so the Submission step becomes a checkmark) and confirm.
+    flowState.submitted = true;
+    showTab(4);
+
+  } catch(err) {
+    alert(currentLang === 'en'
+      ? 'Network error. Please check your connection and try again.'
+      : 'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.');
+    btn.disabled = false;
+    btn.querySelector('span').textContent = currentLang === 'en' ? 'Submit Response' : 'Antwort absenden';
+  }
+});
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+buildLikert();
+loadFlowState();
+applyPendingStep3Return();
+restoreFormState();
+setLang(currentLang);
+setupFlowNavigation();
+setupChatbotEmbed();
+renderFlowStepper();
+renderActivePanel();
+renderFlowWorkspace(flowState.currentStep);
+setupFormPersistence();
+updateProgress();
+setupShareActions();
+</script>
+</body>
+</html>

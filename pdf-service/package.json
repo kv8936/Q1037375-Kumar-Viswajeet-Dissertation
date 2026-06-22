@@ -1,0 +1,19 @@
+{
+  "name": "hazard-chatbot-pdf-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "test": "node src/report-template.test.js",
+    "format": "prettier --write \"src/**/*.js\""
+  },
+  "devDependencies": {
+    "prettier": "^3.8.4"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "playwright": "^1.61.0"
+  }
+}

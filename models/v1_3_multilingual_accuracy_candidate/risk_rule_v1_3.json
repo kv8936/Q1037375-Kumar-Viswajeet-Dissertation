@@ -1,0 +1,11 @@
+{
+    "risk_method": "deterministic_severity_score_rule",
+    "severity_score_mapping": {
+        "1-3": "Low",
+        "4-6": "Medium",
+        "7-9": "High",
+        "0_no_hazard": "none",
+        "unclear_insufficient_evidence": "manual_review"
+    },
+    "reason": "Risk level is rule-based for reproducibility and safety auditability."
+}

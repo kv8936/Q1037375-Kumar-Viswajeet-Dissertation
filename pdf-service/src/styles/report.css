@@ -1,0 +1,502 @@
+:root {
+  color-scheme: light;
+  --ink: #18212f;
+  --muted: #5f6b7a;
+  --line: #d7dee8;
+  --panel: #f7f9fc;
+  --panel-2: #edf3fb;
+  --accent: #1f5eff;
+  --accent-soft: rgba(31, 94, 255, 0.12);
+  --high: #9d1b2a;
+  --medium: #a15c00;
+  --low: #0f7a4a;
+}
+
+@page {
+  size: A4;
+  margin: 15mm 12mm 24mm 12mm;
+}
+
+* {
+  box-sizing: border-box;
+  orphans: 4;
+  widows: 4;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: var(--ink);
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-size: 10pt;
+  line-height: 1.35;
+  padding-bottom: 24mm;
+}
+
+.page-shell {
+  min-height: calc(297mm - 24mm);
+  padding-bottom: 20mm;
+}
+
+section,
+.section {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+p {
+  orphans: 3;
+  widows: 3;
+}
+
+.report-header {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+  margin-bottom: 14px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 9pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 19pt;
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 10pt;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+
+.badge-high {
+  background: rgba(157, 27, 42, 0.12);
+  color: var(--high);
+  border-color: rgba(157, 27, 42, 0.25);
+}
+
+.badge-medium {
+  background: rgba(161, 92, 0, 0.12);
+  color: var(--medium);
+  border-color: rgba(161, 92, 0, 0.25);
+}
+
+.badge-low {
+  background: rgba(15, 122, 74, 0.12);
+  color: var(--low);
+  border-color: rgba(15, 122, 74, 0.25);
+}
+
+.badge-neutral {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: rgba(31, 94, 255, 0.22);
+}
+
+.meta-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  width: 100%;
+}
+
+.meta-grid dt {
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.meta-grid dd {
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.content-grid {
+  display: block;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+  padding: 10px;
+  margin-bottom: 10px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.card.span-2 {
+  grid-column: span 2;
+}
+
+.card--flow,
+.card--flow .support-box,
+.card--flow .plan-grid,
+.card--flow .finding-grid {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+.section-title {
+  font-size: 8.5pt;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.summary-item {
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.summary-label {
+  color: var(--muted);
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.summary-value {
+  font-weight: 650;
+}
+
+.summary-confidence {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8.5pt;
+}
+
+.probability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.probability-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.probability-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.probability-list li:last-child {
+  border-bottom: 0;
+}
+
+.finding-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.finding-item {
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 10px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.plan-item {
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.plan-item strong {
+  display: block;
+  color: var(--accent);
+  margin-bottom: 4px;
+  font-size: 8.5pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.plan-item p {
+  margin: 0;
+  font-weight: 650;
+}
+
+.finding-label {
+  color: var(--muted);
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.finding-text {
+  font-weight: 650;
+}
+
+.text-block p,
+.mono-box p,
+.support-text p,
+.empty-state {
+  margin: 0 0 6px 0;
+}
+
+.risk-box,
+.support-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.risk-level {
+  font-size: 13pt;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.risk-category {
+  font-size: 9.5pt;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.risk-note {
+  color: var(--ink);
+}
+
+.support-box h2 {
+  margin: 0 0 8px 0;
+  font-size: 9pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+.support-text {
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.evidence-image-frame,
+.evidence-image-placeholder {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 120px;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.evidence-image {
+  display: block;
+  width: 100%;
+  max-height: 190px;
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.evidence-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  min-height: 150px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.placeholder-title {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.placeholder-body {
+  max-width: 40ch;
+}
+
+.caption-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 8px;
+  color: var(--muted);
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.mono-box {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px;
+  white-space: pre-wrap;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.report-footer {
+  position: fixed;
+  left: 12mm;
+  right: 12mm;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 12mm;
+  padding: 6px 0 0;
+  color: var(--muted);
+  font-size: 8pt;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+/* ─── Print utility: force page break before major sections ─── */
+.page-start {
+  break-before: auto;
+  page-break-before: auto;
+}
+
+/* ─── Clean placeholder for empty/unavailable captions ─── */
+.caption-placeholder {
+  display: inline-block;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 8.5pt;
+}
+
+/* ─── Consolidated @media print rules ─── */
+@media print {
+  /* Prevent all content blocks from splitting mid-page */
+  section,
+  .section,
+  .card,
+  .summary-item,
+  .finding-item,
+  .plan-item,
+  .support-box,
+  .mono-box,
+  .evidence-image-frame,
+  .evidence-image-placeholder,
+  .summary-grid,
+  .finding-grid,
+  .plan-grid,
+  .probability-grid,
+  .caption-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card--flow,
+  .card--flow .support-box,
+  .card--flow .plan-grid,
+  .card--flow .finding-grid {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  /* Keep headings attached to their following content */
+  .section-title,
+  .support-box h2 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Force new page before major sections */
+  .page-start {
+    break-before: auto;
+    page-break-before: auto;
+  }
+
+  /* Collapse two-column grids to single column at page boundaries */
+  .summary-grid,
+  .finding-grid,
+  .plan-grid,
+  .probability-grid {
+    grid-template-columns: 1fr;
+  }
+}

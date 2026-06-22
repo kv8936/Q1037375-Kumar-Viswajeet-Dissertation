@@ -1,0 +1,19 @@
+{
+    "risk_model_type": "deterministic_rule",
+    "source_column": "severity_score",
+    "rules": [
+        {
+            "condition": "severity_score <= 3",
+            "risk_level": "Low"
+        },
+        {
+            "condition": "severity_score <= 6",
+            "risk_level": "Medium"
+        },
+        {
+            "condition": "severity_score >= 7",
+            "risk_level": "High"
+        }
+    ],
+    "reason": "ML risk classifier was rejected because safety-critical High \u2192 Low errors are unacceptable. The deterministic rule is transparent and produced 0 High \u2192 Low errors."
+}

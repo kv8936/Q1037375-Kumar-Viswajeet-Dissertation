@@ -1,0 +1,4 @@
+version,component,method,validation_accuracy,test_accuracy,main_limitation,safety_control
+v1_1_candidate,Hazard category classification,TF-IDF + Logistic Regression,0.9259259259259259,0.8888888888888888,"Some confusion remains between overlapping workplace hazard categories, especially Fire, Obstruction, Visibility, and Electrical cases.",Combined manual review rule: hazard confidence < 0.40 OR fire/exit-route obstruction ambiguity detected.
+v1_1_candidate,Risk level classification,Deterministic severity_score rule,1.0,1.0,Risk level depends on correct severity_score availability.,Rule-based mapping prevents High risk being classified as Low when severity_score is correct.
+v1_1_candidate,Manual review mechanism,Combined confidence threshold and fire-obstruction ambiguity rule,,,"Combined rule flags 55.56% of test cases, increasing human review workload.",Caught 6/6 hazard errors and missed 0 hazard errors on the held-out test set.

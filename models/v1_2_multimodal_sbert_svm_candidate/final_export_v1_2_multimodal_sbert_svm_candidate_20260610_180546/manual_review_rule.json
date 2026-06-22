@@ -1,0 +1,5 @@
+{
+    "confidence_threshold": 0.4,
+    "manual_review_condition": "hazard_confidence < 0.40 OR fire/exit-route obstruction ambiguity detected",
+    "known_limitation": "Fire extinguisher or fire-route access cases may overlap with obstruction hazards. These cases should be flagged when confidence is low or ambiguity terms are detected."
+}

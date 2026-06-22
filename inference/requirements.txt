@@ -1,0 +1,15 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+fastapi
+uvicorn[standard]
+scikit-learn==1.6.1
+joblib
+numpy
+pandas
+pillow
+torch==2.12.0
+transformers
+sentence-transformers
+python-multipart
+langdetect
+sentencepiece

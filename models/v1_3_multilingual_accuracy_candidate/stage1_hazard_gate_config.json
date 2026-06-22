@@ -1,0 +1,25 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "stage": "stage1_hazard_gate",
+    "target_column": "hazard_presence_label",
+    "selected_model": "calibrated_linear_svm",
+    "labels": [
+        "hazard_present",
+        "no_hazard",
+        "unclear_insufficient_evidence"
+    ],
+    "validation_accuracy": 1.0,
+    "validation_macro_f1": 1.0,
+    "embedding_model": "intfloat/multilingual-e5-large",
+    "embedding_dimension": 1024,
+    "models_compared": {
+        "logistic_regression": {
+            "validation_accuracy": 1.0,
+            "validation_macro_f1": 1.0
+        },
+        "calibrated_linear_svm": {
+            "validation_accuracy": 1.0,
+            "validation_macro_f1": 1.0
+        }
+    }
+}

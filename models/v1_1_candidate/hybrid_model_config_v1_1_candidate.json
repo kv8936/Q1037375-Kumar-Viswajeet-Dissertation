@@ -1,0 +1,36 @@
+{
+    "version": "v1_1_candidate",
+    "architecture": {
+        "hazard_category": "TF-IDF + Logistic Regression",
+        "risk_level": "deterministic severity_score rule"
+    },
+    "risk_rule": {
+        "Low": "severity_score <= 3",
+        "Medium": "4 <= severity_score <= 6",
+        "High": "severity_score >= 7"
+    },
+    "manual_review_rule": {
+        "hazard_confidence_threshold": 0.4,
+        "confidence_review_condition": "hazard_confidence < 0.40",
+        "ambiguity_review_condition": "fire/exit route terms + obstruction terms detected",
+        "combined_review_condition": "hazard_confidence < 0.40 OR fire_obstruction_ambiguity == True"
+    },
+    "validation_results": {
+        "hazard_accuracy": 0.9259259259259259,
+        "risk_accuracy": 1.0,
+        "risk_high_to_low_errors": 0
+    },
+    "test_results": {
+        "hazard_accuracy": 0.8888888888888888,
+        "risk_accuracy": 1.0,
+        "hazard_errors": 6,
+        "manual_review_flagged_cases": 30,
+        "manual_review_flagged_percentage": 55.56,
+        "hazard_errors_caught_by_review_flag": 6,
+        "hazard_errors_missed_by_review_flag": 0,
+        "risk_high_to_low_errors": 0,
+        "manual_review_rule_type": "combined_confidence_and_fire_obstruction_ambiguity_rule"
+    },
+    "saved_at": "2026-06-10 14:53:05",
+    "updated_at": "2026-06-10 14:58:01"
+}

@@ -1,0 +1,33 @@
+{
+    "model_name": "v1_2_multimodal_sbert_svm_candidate",
+    "export_type": "final_deployment_artifact",
+    "export_timestamp": "20260610_180546",
+    "input_column": "final_model_input_v1_2",
+    "pipeline": [
+        "workplace scenario",
+        "context location",
+        "researcher image caption",
+        "BLIP-2 generated caption",
+        "Sentence-BERT all-mpnet-base-v2 embeddings",
+        "Linear SVM hazard classifier",
+        "severity-score deterministic risk rule",
+        "manual review flag"
+    ],
+    "sbert_model": "sentence-transformers/all-mpnet-base-v2",
+    "classifier": "SVC(kernel='linear', class_weight='balanced', probability=True, random_state=42)",
+    "training_rows_used_for_export": 255,
+    "training_splits_used_for_export": [
+        "train",
+        "validation"
+    ],
+    "test_split_used_for_training": false,
+    "held_out_test_summary": {
+        "hazard_accuracy": 0.9777777777777777,
+        "risk_accuracy": 1.0,
+        "high_to_low_risk_errors": 0,
+        "manual_review_flagged_cases": "7/45",
+        "hazard_errors": 1,
+        "known_error_pattern": "Fire Hazard predicted as Obstruction Hazard for fire-extinguisher access case; safely flagged for manual review."
+    },
+    "do_not_overwrite_versions": true
+}

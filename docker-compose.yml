@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: postgres:${POSTGRES_MAJOR:-16}-alpine
+    environment:
+      POSTGRES_DB: hazard_chatbot
+      POSTGRES_USER: hazard
+      POSTGRES_PASSWORD: hazard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  inference:
+    build:
+      context: ./inference
+    environment:
+      PORT: 8001
+      CAPTION_MODEL_NAME: Salesforce/blip-image-captioning-base
+      PRELOAD_CAPTION_MODEL: "true"
+      MIN_SCENARIO_WORDS: 3
+      MIN_SCENARIO_CHARS: 15
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./models:/app/models:ro
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health').read()\""]
+      interval: 30s
+      timeout: 15s
+      retries: 18
+      start_period: 180s
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      INFERENCE_URL: http://inference:8001
+      PDF_SERVICE_URL: http://pdf-service:3001
+      DATABASE_URL: postgres://hazard:hazard@postgres:5432/hazard_chatbot
+      PRIVACY_MODE: "true"
+      ENABLE_DB_CONTENT_LOGGING: "false"
+      MIN_SCENARIO_WORDS: 3
+      MIN_SCENARIO_CHARS: 15
+      RUST_LOG: info
+    depends_on:
+      postgres:
+        condition: service_started
+      inference:
+        condition: service_healthy
+      pdf-service:
+        condition: service_started
+    ports:
+      - "8000:8000"
+
+  pdf-service:
+    init: true
+    build:
+      context: ./pdf-service
+    environment:
+      PORT: 3001
+    ports:
+      - "3001:3001"
+
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy/Dockerfile
+    depends_on:
+      - backend
+      - inference
+      - pdf-service
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:

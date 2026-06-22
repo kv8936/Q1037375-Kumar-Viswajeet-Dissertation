@@ -1,0 +1,9 @@
+version,artifact_type,file_path,purpose,file_exists,created_at
+v1_1_candidate,Dataset,/content/drive/MyDrive/hazard_chatbot_dissertation/data/v1_1_candidate/Hazard_dataset_v1_1_candidate_patched.xlsx,Patched v1.1 dataset used for retraining and evaluation.,True,2026-06-10 14:59:50
+v1_1_candidate,Model,/content/drive/MyDrive/hazard_chatbot_dissertation/models/v1_1_candidate/hazard_category_model_v1_1_candidate.joblib,Saved TF-IDF + Logistic Regression hazard category classifier.,True,2026-06-10 14:59:50
+v1_1_candidate,Configuration,/content/drive/MyDrive/hazard_chatbot_dissertation/models/v1_1_candidate/hybrid_model_config_v1_1_candidate.json,Hybrid model configuration including risk rule and combined manual-review rule.,True,2026-06-10 14:59:50
+v1_1_candidate,Predictions,/content/drive/MyDrive/hazard_chatbot_dissertation/outputs/v1_1_candidate/test_predictions_v1_1_candidate_with_combined_review.csv,"Held-out test predictions with hazard, risk, confidence, and review flags.",True,2026-06-10 14:59:50
+v1_1_candidate,Error Analysis,/content/drive/MyDrive/hazard_chatbot_dissertation/outputs/v1_1_candidate/hazard_error_cases_v1_1_candidate.csv,Hazard misclassification cases from the held-out test set.,True,2026-06-10 14:59:50
+v1_1_candidate,Threshold Analysis,/content/drive/MyDrive/hazard_chatbot_dissertation/outputs/v1_1_candidate/hazard_confidence_threshold_analysis_v1_1_candidate.csv,Manual-review threshold comparison for hazard confidence.,True,2026-06-10 14:59:50
+v1_1_candidate,Evaluation Summary,/content/drive/MyDrive/hazard_chatbot_dissertation/outputs/v1_1_candidate/final_evaluation_summary_v1_1_candidate.csv,Final dissertation-ready evaluation summary table.,True,2026-06-10 14:59:50
+v1_1_candidate,Model Card,/content/drive/MyDrive/hazard_chatbot_dissertation/outputs/v1_1_candidate/model_card_v1_1_candidate.txt,"Plain-text model card describing architecture, performance, limitations, and safety controls.",True,2026-06-10 14:59:50

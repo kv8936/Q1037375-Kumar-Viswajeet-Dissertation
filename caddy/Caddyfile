@@ -1,0 +1,49 @@
+:80 {
+    encode gzip
+
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+
+    handle /inference* {
+        reverse_proxy inference:8001
+    }
+
+    # Canonical URLs.
+    handle /chatbot {
+        redir * /chatbot/ 308
+    }
+    handle /chatbot/questionnaire {
+        redir * /chatbot/questionnaire/ 308
+    }
+
+    # Standalone questionnaire app (served from /srv/questionnaire).
+    handle_path /chatbot/questionnaire/* {
+        root * /srv/questionnaire
+        try_files {path} /index.html
+        file_server
+    }
+
+    # Backward-compatible legacy questionnaire URLs.
+    handle /questionnaire* {
+        redir * /chatbot/questionnaire/ 308
+    }
+    handle_path /questionnaire/* {
+        root * /srv/questionnaire
+        try_files {path} /index.html
+        file_server
+    }
+
+    # SvelteKit app (chatbot UI), base path /chatbot.
+    # Serve prerendered *.html pages directly, falling back to the SPA shell.
+    handle_path /chatbot/* {
+        root * /srv/chatbot
+        try_files {path} {path}.html /index.html
+        file_server
+    }
+
+    # Site root and anything else → questionnaire landing page.
+    handle {
+        redir * /chatbot/questionnaire/ 308
+    }
+}

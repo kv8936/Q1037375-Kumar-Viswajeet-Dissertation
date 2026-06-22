@@ -1,0 +1,38 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "embedding_model_name": "intfloat/multilingual-e5-large",
+    "embedding_dimension": 1024,
+    "normalize_embeddings": true,
+    "input_column": "embedding_input",
+    "device": "cuda",
+    "created_at": "2026-06-14T17:34:51.695723",
+    "paths": {
+        "train": {
+            "embedding_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/embeddings_train_v1_3.npy",
+            "metadata_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/metadata_train_v1_3.csv",
+            "rows": 1468,
+            "embedding_shape": [
+                1468,
+                1024
+            ]
+        },
+        "val": {
+            "embedding_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/embeddings_val_v1_3.npy",
+            "metadata_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/metadata_val_v1_3.csv",
+            "rows": 316,
+            "embedding_shape": [
+                316,
+                1024
+            ]
+        },
+        "test": {
+            "embedding_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/embeddings_test_v1_3.npy",
+            "metadata_path": "/content/drive/MyDrive/model 4/models/v1_3_multilingual_accuracy_candidate/embeddings/metadata_test_v1_3.csv",
+            "rows": 316,
+            "embedding_shape": [
+                316,
+                1024
+            ]
+        }
+    }
+}

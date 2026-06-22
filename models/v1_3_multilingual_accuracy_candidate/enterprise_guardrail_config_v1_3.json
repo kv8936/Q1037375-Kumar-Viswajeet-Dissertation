@@ -1,0 +1,19 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "purpose": "enterprise post-classification safety guardrails",
+    "guardrails": [
+        "blocked/obstructed exits, escape routes, walkways, stairs -> Obstruction Hazard",
+        "oil/spill/liquid contamination on walking surface -> Slip/Trip Hazard",
+        "poor visibility, dark, blind spot, unuebersichtlich -> Visibility Hazard"
+    ],
+    "final_category_accuracy_before": 0.9778481012658228,
+    "final_category_accuracy_after": 0.9936708860759493,
+    "stage2_accuracy_before": 0.9602272727272727,
+    "stage2_accuracy_after": 0.9886363636363636,
+    "stage2_macro_f1_before": 0.9609936245834366,
+    "stage2_macro_f1_after": 0.9888361151519045,
+    "predictions_changed": 5,
+    "errors_fixed": 5,
+    "new_errors_introduced": 0,
+    "remaining_errors_after_guardrail": 2
+}

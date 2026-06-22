@@ -1,0 +1,13 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "stage1_accuracy": 1.0,
+    "stage1_macro_f1": 1.0,
+    "stage2_accuracy_actual_hazards": 0.9602272727272727,
+    "stage2_macro_f1_actual_hazards": 0.9609936245834366,
+    "final_hazard_category_accuracy": 0.9778481012658228,
+    "final_deterministic_risk_accuracy": 1.0,
+    "missed_real_hazards": 0,
+    "false_hazard_detections": 0,
+    "test_rows": 316,
+    "test_actual_hazard_rows": 176
+}

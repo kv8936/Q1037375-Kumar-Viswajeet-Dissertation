@@ -1,0 +1,22 @@
+{
+    "model_version": "v1_3_multilingual_accuracy_candidate",
+    "final_category_accuracy_before_guardrail": 0.9778481012658228,
+    "final_category_accuracy_after_v1_guardrail": 0.9936708860759493,
+    "final_category_accuracy_after_v2_guardrail": 0.9968354430379747,
+    "stage2_accuracy_after_v2": 0.9943181818181818,
+    "stage2_macro_f1_after_v2": 0.9944305207463101,
+    "remaining_errors_after_v2": 1,
+    "manual_review_count": 104,
+    "manual_review_rate": 0.3291139240506329,
+    "errors_after_v2": 1,
+    "errors_caught_by_manual_review": 1,
+    "errors_not_caught_by_manual_review": 0,
+    "manual_review_rules": [
+        "unclear_insufficient_evidence",
+        "low_stage1_confidence < 0.75",
+        "low_stage2_confidence < 0.65",
+        "weak_or_filtered_image_caption",
+        "ambiguous_chemical_container_context",
+        "rule_based_guardrail_applied"
+    ]
+}

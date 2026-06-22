@@ -1,0 +1,67 @@
+
+MODEL CARD: Workplace Hazard AI Chatbot - v1.1 Candidate
+
+Project:
+Assessing the Accuracy, Usability, and Decision-Support Capability of an AI-powered Chatbot
+for Workplace Hazard Identification and Risk Assessment.
+
+Version:
+v1_1_candidate
+
+Purpose:
+This model version is designed to support workplace hazard identification and early-stage
+risk assessment in a controlled dissertation prototype. It is not designed to replace
+professional workplace safety inspection or legal compliance assessment.
+
+Dataset:
+- Total rows: 360
+- Hazard categories: 6
+- Risk levels: Low, Medium, High
+- Split: 252 train, 54 validation, 54 test
+- Stratification: hazard_category + risk_level
+
+Architecture:
+1. Hazard category classification:
+   - Method: TF-IDF + Logistic Regression
+   - Validation accuracy: 0.9259
+   - Test accuracy: 0.8889
+
+2. Risk level classification:
+   - Method: deterministic severity_score rule
+   - Rule:
+     Low = severity_score 2–3
+     Medium = severity_score 4–6
+     High = severity_score 7–9
+   - Validation accuracy: 1.0000
+   - Test accuracy: 1.0000
+   - High → Low test errors: 0
+
+Combined Manual Review Safety Control:
+The chatbot flags a case for manual review if either condition is met:
+
+1. Confidence rule:
+   hazard_confidence < 0.40
+
+2. Ambiguity rule:
+   fire/exit route terms and obstruction terms are both detected.
+
+Test-set manual-review performance:
+- Test cases flagged for manual review: 30 out of 54
+- Flagged percentage: 55.56%
+- Hazard errors caught by combined review flag: 6
+- Hazard errors missed by combined review flag: 0
+
+Known Limitations:
+- Hazard classification still shows confusion between overlapping workplace categories,
+  especially Fire, Obstruction, Visibility, and Electrical hazards.
+- The combined manual-review rule catches all observed hazard errors in the test set, but it flags
+  more than half of test cases, increasing human review workload.
+- Risk classification depends on the availability and correctness of severity_score.
+- The dataset is synthetic and should be interpreted as prototype evidence, not operational proof.
+- The ambiguity rule is domain-specific and was added after error analysis of fire-exit obstruction cases.
+
+Conclusion:
+v1.1_candidate improves safety and transparency by replacing the weak ML risk classifier with
+a deterministic severity_score rule and adding a combined manual-review mechanism for uncertain
+or ambiguous hazard predictions. The hybrid design is suitable for dissertation evaluation,
+provided its limitations and human-review requirement are clearly reported.
