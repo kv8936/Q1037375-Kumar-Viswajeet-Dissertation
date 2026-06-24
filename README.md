@@ -6,7 +6,7 @@
 
 - Dissertation ID: Q1037375
 - Author: Kumar Viswajeet
-- Email: kumarviswajeet6@gmail.com
+- Email: hazard-chatbot@mailbox.org
 - Programme: MSc Artificial Intelligence
 - Institution: Berlin School of Business and Innovation
 
