@@ -1,6 +1,6 @@
 #  Workplace Hazard Assessment Chatbot
 
-**Live Deployment:** _set your own deployment URL after you publish_
+**Live Deployment:** https://hazard-chatbot.rayports.com/ 
 
 ## Academic Context
 
